@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import * as CAM from './camera.js';
+import * as Wpoint from './plan/point/index';
 
-export let camOrbit;
-let container;
+export let container, camOrbit;
 let scene, renderer;
 let ambientLight, light;
 
@@ -30,7 +30,7 @@ export function init() {
     container: renderer.domElement,
     renderer: renderer,
     scene: scene,
-    setCam: '3D',
+    setCam: '2D',
   });
 
   //cameraControls.addEventListener('change', render);
@@ -43,9 +43,6 @@ export function init() {
   scene.add(ambientLight);
   scene.add(light);
 
-  // EVENTS
-  //window.addEventListener('resize', onWindowResize);
-
   //Grid
   const helper = new THREE.GridHelper(200, 200);
   helper.position.y = 0;
@@ -53,5 +50,8 @@ export function init() {
   helper.material.transparent = true;
   scene.add(helper);
 
+  Wpoint.crBtnPointWall({ container });
+
+  //render
   camOrbit.render();
 }

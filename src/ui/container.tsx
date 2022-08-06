@@ -89,7 +89,7 @@ const styles: any = {
 export default function Container() {
   let arr = [
     { id: 1, type: '2D', display: '' },
-    { id: 2, type: '3D', display: '' },
+    { id: 2, type: '3D', display: 'none' },
   ];
 
   const [btns, setState] = useState(arr);
@@ -122,7 +122,7 @@ export default function Container() {
     //   })
     // );
   };
-  console.log(444);
+
   return (
     <div>
       <div nameid="panelT" style={styles.panelT}></div>

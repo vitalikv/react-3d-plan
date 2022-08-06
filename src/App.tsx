@@ -5,7 +5,6 @@ import React from 'react';
 import Container from './ui/container';
 
 function App() {
-  console.log(99999);
   return <Container />;
 }
 
