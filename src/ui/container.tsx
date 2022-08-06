@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import * as Tscene from '../three-scene/index';
 
 declare module 'react' {
@@ -86,34 +86,43 @@ const styles: any = {
   },
 };
 
-
-
 export default function Container() {
-  
-
   let arr = [
     { id: 1, type: '2D', display: '' },
-    { id: 2, type: '3D', display: 'none' },
+    { id: 2, type: '3D', display: '' },
   ];
 
-  const [btns, setItem] = useState(arr);
+  const [btns, setState] = useState(arr);
 
-  function clickBtn({ type, name }: { type: string, name?: null | string }){
-    setItem(
-      btns.map((item) => {
-        item.display = 'none';
-        if (item.type === type) {
-          item.display = '';
-          
-          Tscene.camOrbit.setActiveCam({ cam: item.type });
-        }
-        return item;
-      })
+  const clickBtn = ({ type, name }: { type: string; name?: null | string }) => {
+    let newArr: Array<any> = [...btns];
 
-      
-    );
-  }
+    if (type === '2D') {
+      newArr[0].display = 'none';
+      newArr[1].display = '';
+    }
+    if (type === '3D') {
+      newArr[0].display = '';
+      newArr[1].display = 'none';
+    }
 
+    Tscene.camOrbit.setActiveCam({ cam: type });
+
+    setState(newArr);
+
+    // setState(
+    //   btns.map((item) => {
+    //     item.display = 'none';
+    //     if (item.type === type) {
+    //       item.display = '';
+
+    //       //Tscene.camOrbit.setActiveCam({ cam: item.type });
+    //     }
+    //     return item;
+    //   })
+    // );
+  };
+  console.log(444);
   return (
     <div>
       <div nameid="panelT" style={styles.panelT}></div>
@@ -123,10 +132,10 @@ export default function Container() {
       </div>
 
       <div style={styles.wrapBtnCam}>
-        <div nameid="cam2D" onClick={(e) => clickBtn({type: '3D'})} style={{ ...styles.btnCam, ...styles.btnGradient, display:btns[0].display }}>
+        <div nameid="cam2D" onClick={(e) => clickBtn({ type: '2D' })} style={{ ...styles.btnCam, ...styles.btnGradient, display: btns[0].display }}>
           2D
         </div>
-        <div nameid="cam3D" onClick={(e) => clickBtn({type: '2D'})} style={{ ...styles.btnCam, ...styles.btnGradient, display:btns[1].display }}>
+        <div nameid="cam3D" onClick={(e) => clickBtn({ type: '3D' })} style={{ ...styles.btnCam, ...styles.btnGradient, display: btns[1].display }}>
           3D
         </div>
       </div>
