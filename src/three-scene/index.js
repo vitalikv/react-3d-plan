@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as CAM from './camera.js';
 import * as Wpoint from './plan/point/index';
 
-export let container, camOrbit;
+export let container, canvas, camOrbit;
 let scene, renderer;
 let ambientLight, light;
 
@@ -24,6 +24,8 @@ export function init({ ready }) {
   renderer.domElement.style.height = '100%';
   renderer.domElement.style.outline = 'none';
   container.appendChild(renderer.domElement);
+
+  canvas = renderer.domElement;
 
   // CAMERA
   camOrbit = new CAM.CameraOrbit({
