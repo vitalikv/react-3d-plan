@@ -6,7 +6,7 @@ export let container, camOrbit;
 let scene, renderer;
 let ambientLight, light;
 
-export function init() {
+export function init({ ready }) {
   container = document.body.querySelector('[nameId="containerScene2"]');
 
   //   const container = document.createElement('div');
@@ -50,8 +50,10 @@ export function init() {
   helper.material.transparent = true;
   scene.add(helper);
 
-  Wpoint.crBtnPointWall({ container });
+  Wpoint.crBtnPointWall({ container, canvas: renderer.domElement });
 
   //render
   camOrbit.render();
+
+  if (ready) ready();
 }

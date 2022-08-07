@@ -6,13 +6,15 @@ import reportWebVitals from './reportWebVitals';
 
 import * as Thrscene from './three-scene/index';
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  //<React.StrictMode>
-  <App />
-  //</React.StrictMode>
-);
+function startReact(): void {
+  const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+  root.render(
+    //<React.StrictMode>
+    <App />
+    //</React.StrictMode>
+  );
+}
 
-Thrscene.init();
+Thrscene.init({ ready: startReact });
 
 reportWebVitals();
