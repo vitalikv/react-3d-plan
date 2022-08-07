@@ -86,6 +86,10 @@ const styles: any = {
   },
 };
 
+const _global = (window /* browser */ || global) /* node */ as any;
+
+export let upSet: any = {};
+
 export default function Container() {
   let arr = [
     { id: 1, type: '2D', display: '' },
@@ -122,6 +126,12 @@ export default function Container() {
     //   })
     // );
   };
+
+  _global.setJj = (type: any) => {
+    clickBtn({ type: type });
+  };
+
+  upSet.clickBtn = clickBtn;
 
   return (
     <div>
