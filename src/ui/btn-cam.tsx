@@ -99,20 +99,20 @@ export default function Container() {
   const [btns, setState] = useState(arr);
 
   const clickBtn = ({ type, name }: { type: string; name?: null | string }) => {
-    let newArr: Array<any> = [...btns];
+    //let newArr: Array<any> = [...btns];
 
     if (type === '2D') {
-      newArr[0].display = 'none';
-      newArr[1].display = '';
+      btns[0].display = 'none';
+      btns[1].display = '';
     }
     if (type === '3D') {
-      newArr[0].display = '';
-      newArr[1].display = 'none';
+      btns[0].display = '';
+      btns[1].display = 'none';
     }
 
     Tscene.camOrbit.setActiveCam({ cam: type });
 
-    setState(newArr);
+    setState([...btns]);
 
     // setState(
     //   btns.map((item) => {
