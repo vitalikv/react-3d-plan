@@ -1,4 +1,4 @@
-import { upSet } from '../../../ui/btn-cam';
+import { store } from '../../../ui/store/store';
 
 export function crBtnPointWall({ container, canvas }: { container: HTMLElement; canvas: HTMLCanvasElement }): void {
   //let el: HTMLElement | null = Tscene.container.querySelector('[nameId="blockButton_1"]');
@@ -9,10 +9,12 @@ export function crBtnPointWall({ container, canvas }: { container: HTMLElement; 
 
   container.append(elem);
 
+  const { dispatch } = store;
+
   elem.onmouseup = () => {
     promise_1().then((data) => {
       console.log(data);
-      upSet.clickBtn({ type: '2D' });
+      dispatch({ type: '2D' });
     });
   };
 
