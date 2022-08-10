@@ -1,4 +1,6 @@
 import { store } from '../../../ui/store/store';
+import { toggle } from '../../../ui/store/btnCamSlice';
+//import { useAppDispatch, useAppSelector } from '../../../ui/store/hook';
 
 export function crBtnPointWall({ container, canvas }: { container: HTMLElement; canvas: HTMLCanvasElement }): void {
   //let el: HTMLElement | null = Tscene.container.querySelector('[nameId="blockButton_1"]');
@@ -14,7 +16,7 @@ export function crBtnPointWall({ container, canvas }: { container: HTMLElement; 
   elem.onmouseup = () => {
     promise_1().then((data) => {
       console.log(data);
-      dispatch({ type: '2D' });
+      dispatch(toggle({ type: '2D' }));
     });
   };
 

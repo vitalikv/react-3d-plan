@@ -1,23 +1,9 @@
-import { createStore } from 'redux';
+import { configureStore } from '@reduxjs/toolkit';
+//import { createStore } from '@reduxjs/toolkit';
+//import { createStore } from 'redux';
+import btnCamReduser from './btnCamSlice';
 
-let defCount = [
-  { id: 1, type: '2D', display: 'none' },
-  { id: 2, type: '3D', display: '' },
-];
+export const store = configureStore({ reducer: { btnCam: btnCamReduser } });
 
-const reducer: any = (state: any = defCount, action: { type: string; payload: any | null }) => {
-  if (action.type === '2D') {
-    state[0].display = 'none';
-    state[1].display = '';
-  }
-  if (action.type === '3D') {
-    state[0].display = '';
-    state[1].display = 'none';
-  }
-
-  state = [...state];
-
-  return state;
-};
-
-export const store = createStore(reducer);
+// export type RootState = ReturnType<typeof store.getState>;
+// export type AppDispatch = typeof store.dispatch;

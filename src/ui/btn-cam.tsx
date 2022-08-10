@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toggle } from './store/btnCamSlice';
 import * as Tscene from '../three-scene/index';
 
 declare module 'react' {
@@ -89,7 +90,7 @@ const styles: any = {
 
 export default function Container() {
   const dispatch = useDispatch();
-  let stateCam: any = useSelector((state) => state);
+  let stateCam: any = useSelector((state: any) => state.btnCam);
 
   console.log(stateCam);
 
@@ -98,7 +99,8 @@ export default function Container() {
   });
 
   const clickBtn = ({ type, name }: { type: string; name?: null | string }) => {
-    dispatch({ type });
+    dispatch(toggle({ type }));
+    console.log(type);
   };
 
   return (
