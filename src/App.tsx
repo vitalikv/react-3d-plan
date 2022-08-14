@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 
 import BtnCam from './ui/btn-cam';
 import BtnPoint from './ui/btn-point';
+import Slider from './ui/slider/index';
 import { store } from './ui/store/store';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       </Provider>
 
       <BtnPoint />
+      <Slider />
     </div>
   );
 }

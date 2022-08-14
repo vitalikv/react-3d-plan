@@ -18,15 +18,6 @@ const styles: any = {
     height: '100%',
     fontFamily: 'Arial, Helvetica, sans-serif',
   },
-  panelT: {
-    position: 'absolute',
-    top: 0,
-    width: '100%',
-    height: '40px',
-    background: '#F0F0F0',
-    borderBottom: '1px solid #D1D1D1',
-    boxSizing: 'border-box',
-  },
 
   wrap: {
     display: 'flex',
@@ -105,7 +96,9 @@ export default function Container() {
 
   return (
     <div>
-      <div nameid="panelT" style={styles.panelT}></div>
+      <div nameid="panelT" className="panelT">
+        <div className="title">Test 3D</div>
+      </div>
 
       <div nameid="panelR" style={styles.panelR}>
         <div nameid="wrapLevel"></div>
