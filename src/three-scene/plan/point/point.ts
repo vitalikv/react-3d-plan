@@ -38,10 +38,13 @@ function geometryPoint(): THREE.BufferGeometry {
 }
 
 export class PointWall extends THREE.Mesh {
-  constructor({ pos }: { pos?: THREE.Vector3 } = {}) {
+  constructor({ pos }: { pos: THREE.Vector3 }) {
     super(geomPoint, matDefault);
 
     this.initObj();
+
+    this.position.copy(pos);
+    this.render();
   }
 
   initObj({ id }: { id?: number } = {}) {
@@ -50,8 +53,6 @@ export class PointWall extends THREE.Mesh {
     this.userData.id = id ? id : 0;
 
     scene.add(this);
-
-    this.render();
   }
 
   render() {

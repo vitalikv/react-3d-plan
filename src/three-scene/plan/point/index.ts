@@ -1,3 +1,7 @@
+import * as THREE from 'three';
+import { canvas, camOrbit, planeMath } from '../../index';
+import { rayIntersect } from '../../core/rayHit';
+import { PointWall } from './point';
 import { store } from '../../../ui/store/store';
 import { toggle } from '../../../ui/store/btnCamSlice';
 
@@ -29,4 +33,42 @@ export function crBtnPointWall({ container, canvas }: { container: HTMLElement; 
       };
     });
   }
+}
+
+export function addPointFromCat({ event }: { event: MouseEvent }): void {
+  planeMath.position.y = 0;
+  planeMath.rotation.set(-Math.PI / 2, 0, 0);
+  planeMath.updateMatrixWorld();
+
+  let intersects = rayIntersect(event, planeMath, 'one');
+  if (intersects.length == 0) return;
+
+  console.log(intersects[0].point);
+  let obj = new PointWall({ pos: intersects[0].point });
+
+  canvas.onmousemove = (event) => {
+    camOrbit.stopMove = true;
+
+    let intersects = rayIntersect(event, planeMath, 'one');
+    if (intersects.length == 0) return;
+
+    obj.position.copy(intersects[0].point);
+
+    camOrbit.render();
+  };
+
+  canvas.onmousedown = (event) => {
+    canvas.onmousemove = null;
+    canvas.onmousedown = null;
+
+    camOrbit.stopMove = false;
+
+    camOrbit.render();
+
+    if (event.button == 2) {
+      //this.deleteObj();
+    } else {
+      //MOVEPOINT.endPoint({ obj: obj, tool: true });
+    }
+  };
 }

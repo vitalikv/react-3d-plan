@@ -2,13 +2,19 @@ import * as THREE from 'three';
 import * as CAM from './camera.js';
 import * as Wpoint from './plan/point/index';
 
-export let container, canvas, scene, camOrbit;
+interface Param {
+  ready: () => void;
+}
+
+export let container: HTMLElement | null, canvas: HTMLCanvasElement, scene: THREE.Scene, camOrbit: CAM.CameraOrbit;
+export let planeMath: THREE.Mesh;
 let renderer;
 let ambientLight, light;
 
-export function init({ ready }) {
+export function init({ ready }: { ready: () => void }): void {
   container = document.body.querySelector('[nameId="containerScene2"]');
 
+  if (!container) return;
   //   const container = document.createElement('div');
   //   document.body.appendChild(container);
 
@@ -46,16 +52,39 @@ export function init({ ready }) {
   scene.add(light);
 
   //Grid
-  const helper = new THREE.GridHelper(200, 200);
+  const helper: THREE.GridHelper = new THREE.GridHelper(200, 200);
   helper.position.y = 0;
-  helper.material.opacity = 0.75;
-  helper.material.transparent = true;
+  if (!Array.isArray(helper.material)) {
+    helper.material.opacity = 0.75;
+    helper.material.transparent = true;
+  }
   scene.add(helper);
 
+  //UI
   Wpoint.crBtnPointWall({ container, canvas: renderer.domElement });
+
+  //planeMath
+  planeMath = crPlaneMath();
 
   //render
   camOrbit.render();
 
   if (ready) ready();
+}
+
+function crPlaneMath(): THREE.Mesh {
+  let geometry = new THREE.PlaneGeometry(10000, 10000);
+  let material = new THREE.MeshPhongMaterial({
+    color: 0xffff00,
+    transparent: true,
+    opacity: 0.5,
+    side: THREE.DoubleSide,
+    visible: false,
+  });
+
+  let planeMath = new THREE.Mesh(geometry, material);
+  planeMath.rotation.set(-Math.PI / 2, 0, 0);
+  scene.add(planeMath);
+
+  return planeMath;
 }
