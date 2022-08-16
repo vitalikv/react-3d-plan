@@ -4,8 +4,8 @@ const btnCamSlice = createSlice({
   name: 'btnCam',
 
   initialState: [
-    { id: 1, type: '2D', display: 'none' },
-    { id: 2, type: '3D', display: '' },
+    { id: 1, type: '2D', display: '' },
+    { id: 2, type: '3D', display: 'none' },
   ],
 
   reducers: {

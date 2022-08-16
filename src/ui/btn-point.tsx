@@ -1,10 +1,12 @@
 import React from 'react';
 import * as Tscene from '../three-scene/index';
+import * as PointWall from '../three-scene/plan/point/point';
 
 export default function Container() {
   function clickBtn() {
     promise_1().then((data) => {
       console.log(data);
+      new PointWall.PointWall();
     });
   }
 

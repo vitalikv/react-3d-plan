@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import * as CAM from './camera.js';
 import * as Wpoint from './plan/point/index';
 
-export let container, canvas, camOrbit;
-let scene, renderer;
+export let container, canvas, scene, camOrbit;
+let renderer;
 let ambientLight, light;
 
 export function init({ ready }) {
