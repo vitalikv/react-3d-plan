@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { canvas, camOrbit, planeMath, mouseEv } from '../../index';
 import { rayIntersect } from '../../core/rayhit';
 import { PointWall } from './point';

@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import * as CAM from './camera.js';
 import * as Wpoint from './plan/point/index';
 import { Mouse } from './mouse-event';
+import { Wall } from './plan/wall/index';
+import { crPlaneMath } from './core/index';
+import { PointWall } from './plan/point/point';
 
 interface Param {
   ready: () => void;
@@ -71,25 +74,13 @@ export function init({ ready }: Param): void {
   //planeMath
   planeMath = crPlaneMath();
 
+  //wall
+  let p1 = new PointWall({ pos: new THREE.Vector3(-2, 0, 1) });
+  let p2 = new PointWall({ pos: new THREE.Vector3(4, 0, 1) });
+  new Wall({ p1, p2 });
+
   //render
   camOrbit.render();
 
   if (ready) ready();
-}
-
-function crPlaneMath(): THREE.Mesh {
-  let geometry = new THREE.PlaneGeometry(10000, 10000);
-  let material = new THREE.MeshPhongMaterial({
-    color: 0xffff00,
-    transparent: true,
-    opacity: 0.5,
-    side: THREE.DoubleSide,
-    visible: false,
-  });
-
-  let planeMath = new THREE.Mesh(geometry, material);
-  planeMath.rotation.set(-Math.PI / 2, 0, 0);
-  scene.add(planeMath);
-
-  return planeMath;
 }
