@@ -1,6 +1,6 @@
 import React from 'react';
 import { canvas } from '../three-scene/index';
-import * as PointIndex from '../three-scene/plan/point/index';
+import * as PointIndex from '../three-scene/plan/point/point-cat';
 
 export default function Container() {
   function clickBtn() {

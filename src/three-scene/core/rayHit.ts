@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { canvas, camOrbit } from '../index';
-import { PointWall } from '../plan/point/point';
+import { PointWall } from 'three-scene/plan/point/point';
 
 export function rayIntersect(
   event: MouseEvent,
