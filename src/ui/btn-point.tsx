@@ -1,11 +1,10 @@
 import React from 'react';
-import * as Tscene from '../three-scene/index';
+import { canvas } from '../three-scene/index';
 import * as PointIndex from '../three-scene/plan/point/index';
 
 export default function Container() {
   function clickBtn() {
     promise_1().then((data) => {
-      console.log(data);
       PointIndex.addPointFromCat({ event: data.event });
     });
   }
@@ -13,7 +12,7 @@ export default function Container() {
   function promise_1(): Promise<any> {
     return new Promise((resolve, reject) => {
       document.onmousemove = function (event) {
-        if (event.target === Tscene.canvas) {
+        if (event.target === canvas) {
           document.onmousemove = null;
           resolve({ event: event });
         }

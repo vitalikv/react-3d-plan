@@ -1,17 +1,19 @@
 import * as THREE from 'three';
 import * as CAM from './camera.js';
 import * as Wpoint from './plan/point/index';
+import { Mouse } from './mouse-event';
 
 interface Param {
   ready: () => void;
 }
 
-export let container: HTMLElement | null, canvas: HTMLCanvasElement, scene: THREE.Scene, camOrbit: CAM.CameraOrbit;
+export let container: HTMLElement | null, canvas: HTMLCanvasElement, scene: THREE.Scene;
+export let mouseEv: Mouse, camOrbit: CAM.CameraOrbit;
 export let planeMath: THREE.Mesh;
 let renderer;
 let ambientLight, light;
 
-export function init({ ready }: { ready: () => void }): void {
+export function init({ ready }: Param): void {
   container = document.body.querySelector('[nameId="containerScene2"]');
 
   if (!container) return;
@@ -59,6 +61,9 @@ export function init({ ready }: { ready: () => void }): void {
     helper.material.transparent = true;
   }
   scene.add(helper);
+
+  //mouse
+  mouseEv = new Mouse({ canvas });
 
   //UI
   Wpoint.crBtnPointWall({ container, canvas: renderer.domElement });

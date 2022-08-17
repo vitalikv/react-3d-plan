@@ -1,7 +1,12 @@
 import * as THREE from 'three';
 import { canvas, camOrbit } from '../index';
+import { PointWall } from '../plan/point/point';
 
-export function rayIntersect(event: MouseEvent, obj: any, t?: string): THREE.Intersection[] {
+export function rayIntersect(
+  event: MouseEvent,
+  obj: PointWall | PointWall[] | THREE.Mesh | THREE.Mesh[],
+  t?: string
+): THREE.Intersection<PointWall | THREE.Mesh>[] {
   let mouse = getMousePosition(event);
 
   function getMousePosition(event: MouseEvent) {
@@ -16,11 +21,11 @@ export function rayIntersect(event: MouseEvent, obj: any, t?: string): THREE.Int
   let raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(mouse, camOrbit.activeCam);
 
-  let intersects: THREE.Intersection[] = [];
+  let intersects: THREE.Intersection<PointWall | THREE.Mesh>[] = [];
 
-  if (t == 'one') {
+  if (t === 'one' && !Array.isArray(obj)) {
     intersects = raycaster.intersectObject(obj);
-  } else if (t == 'arr') {
+  } else if (t === 'arr' && Array.isArray(obj)) {
     intersects = raycaster.intersectObjects(obj, true);
   }
 

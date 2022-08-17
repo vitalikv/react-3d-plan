@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { canvas, camOrbit, planeMath } from '../../index';
-import { rayIntersect } from '../../core/rayHit';
+import { canvas, camOrbit, planeMath, mouseEv } from '../../index';
+import { rayIntersect } from '../../core/rayhit';
 import { PointWall } from './point';
 import { store } from '../../../ui/store/store';
 import { toggle } from '../../../ui/store/btnCamSlice';
@@ -41,16 +41,16 @@ export function addPointFromCat({ event }: { event: MouseEvent }): void {
   planeMath.updateMatrixWorld();
 
   let intersects = rayIntersect(event, planeMath, 'one');
-  if (intersects.length == 0) return;
+  if (intersects.length === 0) return;
 
-  console.log(intersects[0].point);
   let obj = new PointWall({ pos: intersects[0].point });
 
   canvas.onmousemove = (event) => {
     camOrbit.stopMove = true;
+    mouseEv.stop = true;
 
     let intersects = rayIntersect(event, planeMath, 'one');
-    if (intersects.length == 0) return;
+    if (intersects.length === 0) return;
 
     obj.position.copy(intersects[0].point);
 
@@ -62,13 +62,14 @@ export function addPointFromCat({ event }: { event: MouseEvent }): void {
     canvas.onmousedown = null;
 
     camOrbit.stopMove = false;
+    mouseEv.stop = false;
 
     camOrbit.render();
 
-    if (event.button == 2) {
-      //this.deleteObj();
+    if (event.button === 2) {
+      obj.delete();
     } else {
-      //MOVEPOINT.endPoint({ obj: obj, tool: true });
+      addPointFromCat({ event });
     }
   };
 }
