@@ -13,7 +13,7 @@ interface Param {
 export let container: HTMLElement | null, canvas: HTMLCanvasElement, scene: THREE.Scene;
 export let mouseEv: Mouse, camOrbit: CAM.CameraOrbit;
 export let planeMath: THREE.Mesh;
-let renderer;
+export let renderer: THREE.WebGLRenderer;
 let ambientLight, light;
 
 export function init({ ready }: Param): void {

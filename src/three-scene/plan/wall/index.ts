@@ -1,26 +1,51 @@
 import * as THREE from 'three';
-import { scene, camOrbit } from '../../index';
-import { PointWall } from '../point/point';
+import { scene, camOrbit } from 'three-scene/index';
+import { PointWall } from 'three-scene/plan/point/point';
+import { testInfoMemory } from 'three-scene/core/index';
 
 let matDefault = new THREE.MeshStandardMaterial({ color: 0xe3e3e5, wireframe: false });
 
+interface UserInfo {
+  id: number;
+  readonly tag: string;
+  readonly wall: boolean;
+  point: [PointWall | null, PointWall | null];
+}
+
 export class Wall extends THREE.Mesh {
+  userInfo: UserInfo = {
+    id: 0,
+    tag: 'wall',
+    wall: true,
+    point: [null, null],
+  };
+
   constructor({ p1, p2 }: { p1: PointWall; p2: PointWall }) {
     super(new THREE.BufferGeometry(), matDefault);
 
     this.initWall({ p1, p2 });
   }
 
-  initWall({ p1, p2 }: { p1: PointWall; p2: PointWall }) {
-    let geometry = this.updateGeomWall({ p1, p2 });
-    this.geometry.dispose();
-    this.geometry = geometry;
+  protected initWall({ p1, p2 }: { p1: PointWall; p2: PointWall }) {
+    this.userInfo.id = 0;
+    this.userInfo.point = [p1, p2];
 
+    this.userInfo.point.forEach((o) => {
+      if (o instanceof PointWall) o.addWall({ wall: this });
+    });
+
+    this.updateGeomWall();
+
+    console.log(this);
     scene.add(this);
     this.render();
   }
 
-  updateGeomWall({ p1, p2 }: { p1: PointWall; p2: PointWall }) {
+  updateGeomWall() {
+    let [p1, p2] = this.userInfo.point;
+    if (!(p1 instanceof PointWall) || !(p2 instanceof PointWall)) return;
+
+    testInfoMemory();
     let dir = new THREE.Vector2(p1.position.z - p2.position.z, p1.position.x - p2.position.x).normalize(); // перпендикуляр
     let width = 0.02;
     let offsetL = new THREE.Vector2(dir.x * -width, dir.y * -width);
@@ -40,10 +65,11 @@ export class Wall extends THREE.Mesh {
     geometry.rotateX(-Math.PI / 2);
     geometry.translate(0, p1.position.y, 0);
 
-    return geometry;
+    this.geometry.dispose();
+    this.geometry = geometry;
   }
 
-  render() {
+  protected render() {
     camOrbit.render();
   }
 }

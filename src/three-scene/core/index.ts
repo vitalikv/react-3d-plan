@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { scene } from '../index';
+import { scene, renderer } from 'three-scene/index';
 
 // удаление значения из массива
 export function deleteValueFromArrya({ arr, obj }: { arr: THREE.Mesh[]; obj: THREE.Mesh }) {
@@ -26,4 +26,8 @@ export function crPlaneMath(): THREE.Mesh {
   scene.add(planeMath);
 
   return planeMath;
+}
+
+export function testInfoMemory() {
+  console.log(renderer.info.memory);
 }

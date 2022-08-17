@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import { canvas, scene, camOrbit, mouseEv, planeMath } from '../../index';
-import { rayIntersect } from '../../core/rayhit';
-import { deleteValueFromArrya } from '../../core/index';
+import { canvas, scene, camOrbit, mouseEv, planeMath } from 'three-scene/index';
+import { rayIntersect } from 'three-scene/core/rayhit';
+import { deleteValueFromArrya } from 'three-scene/core/index';
+import { Wall } from 'three-scene/plan/wall/index';
 
 export let points: PointWall[] = [];
 
@@ -41,7 +42,21 @@ function geometryPoint(): THREE.BufferGeometry {
   return geometry;
 }
 
+interface UserInfo {
+  id: number;
+  readonly tag: string;
+  readonly pointWall: boolean;
+  wall: Wall[];
+}
+
 export class PointWall extends THREE.Mesh {
+  userInfo: UserInfo = {
+    id: 0,
+    tag: 'pointWall',
+    pointWall: true,
+    wall: [],
+  };
+
   constructor({ pos }: { pos: THREE.Vector3 }) {
     super(geomPoint, matDefault);
 
@@ -51,19 +66,21 @@ export class PointWall extends THREE.Mesh {
     this.render();
   }
 
-  initObj({ id }: { id?: number } = {}) {
-    this.userData.tag = 'pointWall';
-    this.userData.pointWall = true;
-    this.userData.id = id ? id : 0;
+  protected initObj({ id }: { id?: number } = {}) {
+    this.userInfo.id = id ? id : 0;
 
     scene.add(this);
 
     points.push(this);
   }
 
+  addWall({ wall }: { wall: Wall }) {
+    this.userInfo.wall.push(wall);
+  }
+
   click({ pos }: { pos: THREE.Vector3 }) {
     start();
-
+    console.log(this);
     function start() {
       planeMath.position.y = pos.y;
       planeMath.rotation.set(-Math.PI / 2, 0, 0);
@@ -82,6 +99,10 @@ export class PointWall extends THREE.Mesh {
       this.position.add(pos);
 
       pos = intersects[0].point;
+
+      this.userInfo.wall.forEach((o) => {
+        if (o instanceof Wall) o.updateGeomWall();
+      });
 
       this.render();
     };
@@ -103,7 +124,7 @@ export class PointWall extends THREE.Mesh {
     this.render();
   }
 
-  render() {
+  protected render() {
     camOrbit.render();
   }
 }

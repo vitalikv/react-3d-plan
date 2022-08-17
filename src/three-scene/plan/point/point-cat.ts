@@ -1,5 +1,5 @@
-import { canvas, camOrbit, planeMath, mouseEv } from '../../index';
-import { rayIntersect } from '../../core/rayhit';
+import { canvas, camOrbit, planeMath, mouseEv } from 'three-scene/index';
+import { rayIntersect } from 'three-scene/core/rayhit';
 import { PointWall } from './point';
 
 export function addPointFromCat({ event }: { event: MouseEvent }): void {
