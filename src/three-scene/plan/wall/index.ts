@@ -3,6 +3,8 @@ import { scene, camOrbit } from 'three-scene/index';
 import { PointWall } from 'three-scene/plan/point/point';
 import { testInfoMemory } from 'three-scene/core/index';
 
+export let walls: Wall[] = [];
+
 let matDefault = new THREE.MeshStandardMaterial({ color: 0xe3e3e5, wireframe: false });
 
 interface UserInfo {
@@ -36,8 +38,10 @@ export class Wall extends THREE.Mesh {
 
     this.updateGeomWall();
 
-    console.log(this);
     scene.add(this);
+
+    walls.push(this);
+
     this.render();
   }
 
@@ -45,7 +49,6 @@ export class Wall extends THREE.Mesh {
     let [p1, p2] = this.userInfo.point;
     if (!(p1 instanceof PointWall) || !(p2 instanceof PointWall)) return;
 
-    testInfoMemory();
     let dir = new THREE.Vector2(p1.position.z - p2.position.z, p1.position.x - p2.position.x).normalize(); // перпендикуляр
     let width = 0.02;
     let offsetL = new THREE.Vector2(dir.x * -width, dir.y * -width);
@@ -67,6 +70,31 @@ export class Wall extends THREE.Mesh {
 
     this.geometry.dispose();
     this.geometry = geometry;
+  }
+
+  delete() {
+    testInfoMemory();
+    console.log(walls.length);
+
+    walls = walls.filter((o) => o !== this);
+
+    let p = this.userInfo.point;
+
+    this.userInfo.point.forEach((point) => {
+      if (point instanceof PointWall) point.delWall({ wall: this });
+    });
+
+    this.userInfo.point = [null, null];
+    this.geometry.dispose();
+    scene.remove(this);
+    this.render();
+
+    p.forEach((point) => {
+      if (point instanceof PointWall && point.userInfo.wall.length == 0) point.delete();
+    });
+
+    testInfoMemory();
+    console.log(walls.length);
   }
 
   protected render() {

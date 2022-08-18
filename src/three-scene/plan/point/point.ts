@@ -78,9 +78,13 @@ export class PointWall extends THREE.Mesh {
     this.userInfo.wall.push(wall);
   }
 
+  delWall({ wall }: { wall: Wall }) {
+    deleteValueFromArrya({ arr: this.userInfo.wall, obj: wall });
+  }
+
   click({ pos }: { pos: THREE.Vector3 }) {
     start();
-    console.log(this);
+    console.log(this.userInfo);
     function start() {
       planeMath.position.y = pos.y;
       planeMath.rotation.set(-Math.PI / 2, 0, 0);
@@ -100,8 +104,8 @@ export class PointWall extends THREE.Mesh {
 
       pos = intersects[0].point;
 
-      this.userInfo.wall.forEach((o) => {
-        if (o instanceof Wall) o.updateGeomWall();
+      this.userInfo.wall.forEach((wall) => {
+        if (wall instanceof Wall) wall.updateGeomWall();
       });
 
       this.render();
@@ -119,8 +123,15 @@ export class PointWall extends THREE.Mesh {
   }
 
   delete() {
+    this.userInfo.wall.forEach((wall) => {
+      if (wall instanceof Wall) {
+        wall.delete();
+      }
+    });
+
     deleteValueFromArrya({ arr: points, obj: this });
     scene.remove(this);
+
     this.render();
   }
 
