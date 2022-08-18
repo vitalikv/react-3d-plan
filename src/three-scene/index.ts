@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as CAM from './camera.js';
+import * as CAM from './camera';
 import * as Wpoint from './plan/point/index';
 import { Mouse } from './mouse-event';
 import { Wall } from './plan/wall/index';
@@ -41,7 +41,7 @@ export function init({ ready }: Param): void {
 
   // CAMERA
   camOrbit = new CAM.CameraOrbit({
-    container: renderer.domElement,
+    canvas: renderer.domElement,
     renderer: renderer,
     scene: scene,
     setCam: '2D',

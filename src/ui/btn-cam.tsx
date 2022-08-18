@@ -86,7 +86,7 @@ export default function Container() {
   console.log(stateCam);
 
   stateCam.forEach((item: any) => {
-    if (item.display === '') Tscene.camOrbit.setActiveCam({ cam: item.type });
+    if (item.display === '') Tscene.camOrbit.setActiveCam(item.type);
   });
 
   const clickBtn = ({ type, name }: { type: string; name?: null | string }) => {

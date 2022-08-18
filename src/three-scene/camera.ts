@@ -1,27 +1,38 @@
 import * as THREE from 'three';
 import { composer, changeCamera } from 'three-scene/core/composer-render';
 
+interface Param {
+  renderer: THREE.WebGLRenderer;
+  canvas: HTMLCanvasElement;
+  scene: THREE.Scene;
+  setCam: string;
+}
+
 export class CameraOrbit {
-  constructor(params) {
+  params;
+  cam2D;
+  cam3D;
+  activeCam: THREE.Camera;
+  planeMath: THREE.Mesh;
+  typeBrowser;
+  stopMove;
+  mouse;
+
+  constructor(params: Param) {
+    console.log(params);
     this.params = params;
     this.cam2D = this.initCam2D();
     this.cam3D = this.initCam3D();
     this.planeMath = this.initPlaneMath();
     this.activeCam = this.cam2D;
 
-    this.detectBrowser = this.detectBrowser();
+    this.typeBrowser = this.getBrowser();
 
     this.stopMove = false;
 
-    this.mouse = {};
-    this.mouse.button = '';
-    this.mouse.down = false;
-    this.mouse.move = false;
-    this.mouse.pos = {};
-    this.mouse.pos.x = 0;
-    this.mouse.pos.y = 0;
+    this.mouse = { button: '', down: false, move: false, pos: { x: 0, y: 0 } };
 
-    if (params.setCam) this.setActiveCam({ cam: params.setCam });
+    if (params.setCam) this.setActiveCam(params.setCam);
     this.initEvent();
   }
 
@@ -36,22 +47,22 @@ export class CameraOrbit {
     let mouseWheel = this.mouseWheel.bind(this);
     let windowResize = this.windowResize.bind(this);
 
-    this.params.container.addEventListener('mousedown', mouseDown, false);
-    this.params.container.addEventListener('mousemove', mouseMove, false);
-    this.params.container.addEventListener('mouseup', mouseUp, false);
+    this.params.canvas.addEventListener('mousedown', mouseDown, false);
+    this.params.canvas.addEventListener('mousemove', mouseMove, false);
+    this.params.canvas.addEventListener('mouseup', mouseUp, false);
 
-    this.params.container.addEventListener('touchstart', mouseDown, false);
-    this.params.container.addEventListener('touchmove', mouseMove, false);
-    this.params.container.addEventListener('touchend', mouseUp, false);
+    //this.params.canvas.addEventListener('touchstart', mouseDown, false);
+    //this.params.canvas.addEventListener('touchmove', mouseMove, false);
+    //this.params.canvas.addEventListener('touchend', mouseUp, false);
 
-    this.params.container.addEventListener('DOMMouseScroll', mouseWheel, false);
-    this.params.container.addEventListener('mousewheel', mouseWheel, false);
+    this.params.canvas.addEventListener('DOMMouseScroll', mouseWheel, false);
+    this.params.canvas.addEventListener('mousewheel', mouseWheel, false);
 
     window.addEventListener('resize', windowResize, false);
   }
 
   initCam2D() {
-    let aspect = this.params.container.clientWidth / this.params.container.clientHeight;
+    let aspect = this.params.canvas.clientWidth / this.params.canvas.clientHeight;
     let d = 5;
     let camera2D = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 1, 1000);
     camera2D.position.set(0, 10, 0);
@@ -64,7 +75,7 @@ export class CameraOrbit {
   }
 
   initCam3D() {
-    let camera3D = new THREE.PerspectiveCamera(65, this.params.container.clientWidth / this.params.container.clientHeight, 0.01, 1000);
+    let camera3D = new THREE.PerspectiveCamera(65, this.params.canvas.clientWidth / this.params.canvas.clientHeight, 0.01, 1000);
     camera3D.rotation.order = 'YZX'; //'ZYX'
     camera3D.position.set(5, 7, 5);
     camera3D.lookAt(new THREE.Vector3());
@@ -76,7 +87,7 @@ export class CameraOrbit {
     camera3D.userData.camera.click = {};
     camera3D.userData.camera.click.pos = new THREE.Vector3();
 
-    function targetO(scene) {
+    function targetO(scene: THREE.Scene) {
       let material = new THREE.MeshPhongMaterial({
         color: 0x0000ff,
         transparent: true,
@@ -110,8 +121,8 @@ export class CameraOrbit {
     return planeMath;
   }
 
-  setActiveCam(params) {
-    let cam = params.cam === '2D' ? this.cam2D : this.cam3D;
+  setActiveCam(type: string) {
+    let cam = type === '2D' ? this.cam2D : this.cam3D;
 
     this.activeCam = cam;
     if (composer) changeCamera({ camera: this.activeCam });
@@ -119,12 +130,12 @@ export class CameraOrbit {
     this.render();
   }
 
-  mouseDown(event) {
+  mouseDown(event: MouseEvent) {
     if (this.stopMove) return;
     this.mouse.down = true;
     this.mouse.move = false;
 
-    switch (event.button) {
+    switch (event instanceof MouseEvent && event.button) {
       case 0:
         this.mouse.button = 'left';
         break;
@@ -138,58 +149,43 @@ export class CameraOrbit {
         this.mouse.button = 'right';
     }
 
-    if (event.changedTouches) {
-      event.clientX = event.targetTouches[0].clientX;
-      event.clientY = event.targetTouches[0].clientY;
-      this.mouse.button = 'left';
-    }
-
     this.startCam2D({
       camera2D: this.cam2D,
       event: event,
-      button: this.mouse.button,
     });
     this.startCam3D({
       camera3D: this.cam3D,
       event: event,
-      button: this.mouse.button,
     });
 
     this.render();
   }
 
-  mouseMove(event) {
+  mouseMove(event: MouseEvent) {
     if (this.stopMove) return;
     if (!this.mouse.down) return;
-
-    if (event.changedTouches) {
-      event.clientX = event.targetTouches[0].clientX;
-      event.clientY = event.targetTouches[0].clientY;
-    }
 
     if (this.mouse.down && !this.mouse.move) {
       this.mouse.move = true;
     }
 
     if (this.activeCam === this.cam2D) {
-      this.moveCam2D(this.cam2D, event, this.mouse.button);
+      this.moveCam2D(event);
     } else if (this.activeCam === this.cam3D) {
-      this.moveCam3D(this.cam3D, event, this.mouse.button);
+      this.moveCam3D(event);
     }
-
-    //console.log(event.clientX);
 
     this.render();
   }
 
-  mouseUp(event) {
+  mouseUp(event: MouseEvent) {
     this.mouse.button = '';
     this.mouse.down = false;
     this.mouse.move = false;
   }
 
   windowResize() {
-    const canvas = this.params.container;
+    const canvas = this.params.canvas;
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     const needResize = canvas.width !== width || canvas.height !== height;
@@ -217,7 +213,7 @@ export class CameraOrbit {
     this.render();
   }
 
-  startCam2D({ camera2D, event, button }) {
+  startCam2D({ camera2D, event }: { camera2D: THREE.OrthographicCamera; event: MouseEvent }) {
     if (this.activeCam !== camera2D) return;
 
     let planeMath = this.planeMath;
@@ -226,13 +222,12 @@ export class CameraOrbit {
     planeMath.rotation.set(-Math.PI / 2, 0, 0);
     planeMath.updateMatrixWorld();
 
-    let intersects = this.rayIntersect(event, planeMath, 'one');
-
-    this.mouse.pos.x = intersects[0].point.x;
+    let intersects = this.rayIntersect(event, planeMath);
+    if (intersects.length > 0) this.mouse.pos.x = intersects[0].point.x;
     this.mouse.pos.y = intersects[0].point.z;
   }
 
-  startCam3D({ camera3D, event, button }) {
+  startCam3D({ camera3D, event }: { camera3D: THREE.PerspectiveCamera; event: MouseEvent }) {
     if (this.activeCam !== camera3D) {
       return;
     }
@@ -240,7 +235,7 @@ export class CameraOrbit {
     this.mouse.pos.x = event.clientX;
     this.mouse.pos.y = event.clientY;
 
-    if (button === 'left') {
+    if (this.mouse.button === 'left') {
       //var dir = camera.getWorldDirection();
       let dir = new THREE.Vector3().subVectors(camera3D.userData.camera.d3.targetO.position, camera3D.position).normalize();
 
@@ -256,7 +251,7 @@ export class CameraOrbit {
 
       camera3D.userData.camera.d3.theta = THREE.MathUtils.radToDeg(Math.atan2(dir.x, dir.z) - Math.PI) * 2;
       camera3D.userData.camera.d3.phi = dergree;
-    } else if (button === 'right') {
+    } else if (this.mouse.button === 'right') {
       let planeMath = this.planeMath;
 
       planeMath.position.copy(camera3D.userData.camera.d3.targetO.position);
@@ -264,105 +259,101 @@ export class CameraOrbit {
       planeMath.rotation.copy(camera3D.rotation);
       planeMath.updateMatrixWorld();
 
-      let intersects = this.rayIntersect(event, planeMath, 'one');
+      let intersects = this.rayIntersect(event, planeMath);
       if (!intersects[0]) return;
       camera3D.userData.camera.click.pos = intersects[0].point;
     }
   }
 
-  moveCam2D(camera2D, event, click) {
-    if (this.activeCam !== camera2D) return;
-    if (click === '') return;
+  moveCam2D(event: MouseEvent) {
+    if (this.activeCam !== this.cam2D) return;
+    if (this.mouse.button === '') return;
 
-    let intersects = this.rayIntersect(event, this.planeMath, 'one');
+    let intersects = this.rayIntersect(event, this.planeMath);
 
-    camera2D.position.x += this.mouse.pos.x - intersects[0].point.x;
-    camera2D.position.z += this.mouse.pos.y - intersects[0].point.z;
+    this.cam2D.position.x += this.mouse.pos.x - intersects[0].point.x;
+    this.cam2D.position.z += this.mouse.pos.y - intersects[0].point.z;
   }
 
-  moveCam3D(camera3D, event, click) {
-    if (this.activeCam !== camera3D) return;
+  moveCam3D(event: MouseEvent) {
+    if (this.activeCam !== this.cam3D) return;
 
-    if (click === 'left') {
-      let radious = camera3D.userData.camera.d3.targetO.position.distanceTo(camera3D.position);
+    if (this.mouse.button === 'left') {
+      let radious = this.cam3D.userData.camera.d3.targetO.position.distanceTo(this.cam3D.position);
 
-      let theta = -((event.clientX - this.mouse.pos.x) * 0.5) + camera3D.userData.camera.d3.theta;
-      let phi = (event.clientY - this.mouse.pos.y) * 0.5 + camera3D.userData.camera.d3.phi;
+      let theta = -((event.clientX - this.mouse.pos.x) * 0.5) + this.cam3D.userData.camera.d3.theta;
+      let phi = (event.clientY - this.mouse.pos.y) * 0.5 + this.cam3D.userData.camera.d3.phi;
       phi = Math.min(170, Math.max(-60, phi));
 
-      camera3D.position.x = radious * Math.sin((theta * Math.PI) / 360) * Math.cos((phi * Math.PI) / 360);
-      camera3D.position.y = radious * Math.sin((phi * Math.PI) / 360);
-      camera3D.position.z = radious * Math.cos((theta * Math.PI) / 360) * Math.cos((phi * Math.PI) / 360);
+      this.cam3D.position.x = radious * Math.sin((theta * Math.PI) / 360) * Math.cos((phi * Math.PI) / 360);
+      this.cam3D.position.y = radious * Math.sin((phi * Math.PI) / 360);
+      this.cam3D.position.z = radious * Math.cos((theta * Math.PI) / 360) * Math.cos((phi * Math.PI) / 360);
 
-      camera3D.position.add(camera3D.userData.camera.d3.targetO.position);
-      camera3D.lookAt(camera3D.userData.camera.d3.targetO.position);
+      this.cam3D.position.add(this.cam3D.userData.camera.d3.targetO.position);
+      this.cam3D.lookAt(this.cam3D.userData.camera.d3.targetO.position);
 
-      camera3D.userData.camera.d3.targetO.rotation.set(0, camera3D.rotation.y, 0);
+      this.cam3D.userData.camera.d3.targetO.rotation.set(0, this.cam3D.rotation.y, 0);
     }
 
-    if (click === 'right') {
-      let intersects = this.rayIntersect(event, this.planeMath, 'one');
+    if (this.mouse.button === 'right') {
+      let intersects = this.rayIntersect(event, this.planeMath);
       if (!intersects[0]) return;
-      let offset = new THREE.Vector3().subVectors(camera3D.userData.camera.click.pos, intersects[0].point);
-      camera3D.position.add(offset);
-      camera3D.userData.camera.d3.targetO.position.add(offset);
+      let offset = new THREE.Vector3().subVectors(this.cam3D.userData.camera.click.pos, intersects[0].point);
+      this.cam3D.position.add(offset);
+      this.cam3D.userData.camera.d3.targetO.position.add(offset);
     }
   }
 
-  rayIntersect(event, obj, t) {
-    let container = this.params.container;
+  rayIntersect(event: MouseEvent, obj: THREE.Mesh | THREE.Mesh[]) {
+    let getMousePosition = (event: MouseEvent) => {
+      let rect = this.params.canvas.getBoundingClientRect();
 
-    let mouse = getMousePosition(event);
-
-    function getMousePosition(event) {
-      let x = ((event.clientX - container.offsetLeft) / container.clientWidth) * 2 - 1;
-      let y = -((event.clientY - container.offsetTop) / container.clientHeight) * 2 + 1;
+      let x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      let y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
       return new THREE.Vector2(x, y);
-    }
+    };
+
+    let mouse = getMousePosition(event);
 
     let raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, this.activeCam);
 
-    let intersects = null;
-    if (t === 'one') {
+    let intersects: THREE.Intersection[] = [];
+
+    if (!Array.isArray(obj)) {
       intersects = raycaster.intersectObject(obj);
-    } else if (t === 'arr') {
+    } else if (Array.isArray(obj)) {
       intersects = raycaster.intersectObjects(obj, true);
     }
 
     return intersects;
   }
 
-  mouseWheel(event) {
-    let delta = event.wheelDelta ? event.wheelDelta / 120 : event.detail ? event.detail / 3 : 0;
-    if (this.type_browser === 'Chrome' || this.type_browser === 'Opera') {
+  mouseWheel(event: any) {
+    //let delta = event.wheelDelta ? event.wheelDelta / 120 : event.detail ? event.detail / 3 : 0;
+    let delta = event.detail ? event.detail / 3 : 0;
+    if (this.typeBrowser === 'Chrome' || this.typeBrowser === 'Opera') {
       delta = -delta;
     }
 
     if (this.activeCam === this.cam2D) {
-      this.cameraZoom2D({ cam2D: this.cam2D, delta: delta });
+      this.cameraZoom2D({ camera2D: this.cam2D, delta: delta });
     } else if (this.activeCam === this.cam3D) {
-      this.cameraZoom3D({ cam3D: this.cam3D, delta: delta });
+      this.cameraZoom3D({ camera3D: this.cam3D, delta: delta });
     }
 
     this.render();
   }
 
-  cameraZoom2D(params) {
-    let camera2D = params.cam2D;
-    let delta = params.delta;
-
+  cameraZoom2D({ camera2D, delta }: { camera2D: THREE.OrthographicCamera; delta: number }) {
     let zoom = camera2D.zoom - delta * 0.1 * (camera2D.zoom / 2);
 
     camera2D.zoom = zoom;
     camera2D.updateProjectionMatrix();
   }
 
-  cameraZoom3D(params) {
-    let camera3D = params.cam3D;
-    let delta = params.delta;
-
+  cameraZoom3D({ camera3D, delta }: { camera3D: THREE.PerspectiveCamera; delta: number }) {
     let movement = delta < 0 ? 1 : -1;
     movement *= 1.2;
 
@@ -376,11 +367,7 @@ export class CameraOrbit {
     offset = stopTargetCam({ posCenter: pos1, posCam: pos2, offset: offset });
 
     // устанавливаем расстояние насколько близко можно приблизиться камерой к target
-    function offsetTargetCam(params) {
-      let dir = params.dir;
-      let dist = params.dist;
-      let posCenter = params.posCenter;
-
+    function offsetTargetCam({ posCenter, dir, dist }: { posCenter: THREE.Vector3; dir: THREE.Vector3; dist: number }) {
       let dirInvers = new THREE.Vector3(-dir.x, -dir.y, -dir.z);
       let offset = new THREE.Vector3().addScaledVector(dirInvers, dist);
 
@@ -390,11 +377,7 @@ export class CameraOrbit {
     }
 
     // запрещаем перемещение камеры за пределы центра/target
-    function stopTargetCam(params) {
-      let offset = params.offset;
-      let posCam = params.posCam;
-      let posCenter = params.posCenter;
-
+    function stopTargetCam({ posCenter, posCam, offset }: { posCenter: THREE.Vector3; posCam: THREE.Vector3; offset: THREE.Vector3 }) {
       let newPos = new THREE.Vector3().addVectors(posCam, offset);
       let dir2 = new THREE.Vector3().subVectors(posCenter, newPos).normalize();
 
@@ -410,7 +393,7 @@ export class CameraOrbit {
     camera3D.position.add(offset);
   }
 
-  detectBrowser() {
+  getBrowser() {
     let ua = navigator.userAgent;
 
     if (ua.search(/MSIE/) > 0) return 'Explorer';
