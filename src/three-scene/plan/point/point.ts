@@ -3,6 +3,7 @@ import { canvas, scene, camOrbit, mouseEv, planeMath } from 'three-scene/index';
 import { rayIntersect } from 'three-scene/core/rayhit';
 import { deleteValueFromArrya } from 'three-scene/core/index';
 import { Wall } from 'three-scene/plan/wall/index';
+import { outlinePass } from 'three-scene/core/composer-render';
 
 export let points: PointWall[] = [];
 
@@ -85,6 +86,9 @@ export class PointWall extends THREE.Mesh {
   click({ pos }: { pos: THREE.Vector3 }) {
     start();
     console.log(this.userInfo);
+
+    outlinePass.selectedObjects = [this];
+
     function start() {
       planeMath.position.y = pos.y;
       planeMath.rotation.set(-Math.PI / 2, 0, 0);

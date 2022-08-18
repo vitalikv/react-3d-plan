@@ -3,8 +3,9 @@ import * as CAM from './camera.js';
 import * as Wpoint from './plan/point/index';
 import { Mouse } from './mouse-event';
 import { Wall } from './plan/wall/index';
-import { crPlaneMath } from './core/index';
-import { PointWall } from './plan/point/point';
+import { crPlaneMath } from 'three-scene/core/index';
+import { PointWall } from 'three-scene/plan/point/point';
+import { initComposerRender } from 'three-scene/core/composer-render';
 
 interface Param {
   ready: () => void;
@@ -27,7 +28,7 @@ export function init({ ready }: Param): void {
   scene.background = new THREE.Color(0xffffff);
 
   // RENDERER
-  renderer = new THREE.WebGLRenderer({ antialias: false });
+  renderer = new THREE.WebGLRenderer({ logarithmicDepthBuffer: true, alpha: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(container.clientWidth, container.clientHeight, false);
   renderer.outputEncoding = THREE.sRGBEncoding;
@@ -46,7 +47,8 @@ export function init({ ready }: Param): void {
     setCam: '2D',
   });
 
-  //cameraControls.addEventListener('change', render);
+  //outline
+  initComposerRender({ renderer, canvas, scene, camera: camOrbit.activeCam });
 
   // LIGHTS
   ambientLight = new THREE.AmbientLight(0x333333);

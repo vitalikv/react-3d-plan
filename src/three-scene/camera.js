@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { composer, changeCamera } from 'three-scene/core/composer-render';
 
 export class CameraOrbit {
   constructor(params) {
@@ -113,7 +114,7 @@ export class CameraOrbit {
     let cam = params.cam === '2D' ? this.cam2D : this.cam3D;
 
     this.activeCam = cam;
-    //infProg.scene.camera = cam;
+    if (composer) changeCamera({ camera: this.activeCam });
 
     this.render();
   }
@@ -429,6 +430,10 @@ export class CameraOrbit {
   }
 
   render() {
-    this.params.renderer.render(this.params.scene, this.activeCam);
+    if (composer) {
+      composer.render();
+    } else {
+      this.params.renderer.render(this.params.scene, this.activeCam);
+    }
   }
 }
