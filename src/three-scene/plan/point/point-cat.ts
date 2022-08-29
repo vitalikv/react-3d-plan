@@ -2,6 +2,7 @@ import { canvas, camOrbit, planeMath, mouseEv } from 'three-scene/index';
 import { rayIntersect } from 'three-scene/core/rayhit';
 import { PointWall } from './point';
 import { Wall } from 'three-scene/plan/wall/index';
+import { deletePointBtn } from 'three-scene/plan/point/index';
 
 export function addPointFromCat({ event, obj1 }: { event: MouseEvent; obj1?: PointWall }): void {
   planeMath.position.y = 0;
@@ -43,7 +44,7 @@ export function addPointFromCat({ event, obj1 }: { event: MouseEvent; obj1?: Poi
     camOrbit.render();
 
     if (event.button === 2) {
-      obj.delete();
+      deletePointBtn({ point: obj });
     } else {
       addPointFromCat({ event, obj1: obj });
     }

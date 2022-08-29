@@ -1,32 +1,35 @@
-import { store } from '../../../ui/store/store';
-import { toggle } from '../../../ui/store/btnCamSlice';
+import { camOrbit, mouseEv } from 'three-scene/index';
+import { PointWall } from 'three-scene/plan/point/point';
+import { Wall } from 'three-scene/plan/wall/index';
+import { outlinePass } from 'three-scene/core/composer-render';
 
-export function crBtnPointWall({ container, canvas }: { container: HTMLElement; canvas: HTMLCanvasElement }): void {
-  //let el: HTMLElement | null = Tscene.container.querySelector('[nameId="blockButton_1"]');
-  let html = '<div style="position: absolute; left: 60px; top: 40px;" class="button1 gradient_1">point 1</div>';
-  let div = document.createElement('div');
-  div.innerHTML = html;
-  let elem = div.firstChild as HTMLElement;
+export function deletePointBtn({ point }: { point: PointWall }) {
+  let p = point.userInfo.point;
+  let w = point.userInfo.wall;
+  if (p.length > 2) return;
 
-  container.append(elem);
+  outlinePass.selectedObjects = [];
+  mouseEv.clear();
 
-  const { dispatch } = store;
+  point.delete();
 
-  elem.onmouseup = () => {
-    promise_1().then((data) => {
-      console.log(data);
-      dispatch(toggle({ type: '2D' }));
-    });
-  };
+  // удаляем из соседних точек инфу удалемой точки и о стенах
+  p.forEach((p1) => p1.delPoint({ point }));
+  w.forEach((wall) => {
+    p.forEach((point) => point.delWall({ wall }));
+  });
 
-  function promise_1(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      document.onmousemove = function (event) {
-        if (event.target === canvas) {
-          document.onmousemove = null;
-          resolve({ event: event });
-        }
-      };
-    });
+  // удаляем стены
+  w.forEach((wall) => wall.delete());
+
+  if (p.length === 2) {
+    new Wall({ p1: p[0], p2: p[1] });
+    return;
   }
+
+  p.forEach((point) => {
+    if (point.userInfo.wall.length === 0 && point.userInfo.point.length === 0) point.delete();
+  });
+
+  camOrbit.render();
 }

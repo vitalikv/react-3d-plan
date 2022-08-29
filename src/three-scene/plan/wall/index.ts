@@ -1,7 +1,9 @@
 import * as THREE from 'three';
-import { scene, camOrbit } from 'three-scene/index';
+import { canvas, scene, camOrbit, mouseEv, planeMath } from 'three-scene/index';
+import { rayIntersect } from 'three-scene/core/rayhit';
 import { PointWall } from 'three-scene/plan/point/point';
 import { testInfoMemory } from 'three-scene/core/index';
+import { outlinePass } from 'three-scene/core/composer-render';
 
 export let walls: Wall[] = [];
 
@@ -11,7 +13,7 @@ interface UserInfo {
   id: number;
   readonly tag: string;
   readonly wall: boolean;
-  point: [PointWall | null, PointWall | null];
+  point: PointWall[];
 }
 
 export class Wall extends THREE.Mesh {
@@ -19,7 +21,7 @@ export class Wall extends THREE.Mesh {
     id: 0,
     tag: 'wall',
     wall: true,
-    point: [null, null],
+    point: [],
   };
 
   constructor({ p1, p2 }: { p1: PointWall; p2: PointWall }) {
@@ -32,9 +34,12 @@ export class Wall extends THREE.Mesh {
     this.userInfo.id = 0;
     this.userInfo.point = [p1, p2];
 
-    this.userInfo.point.forEach((o) => {
-      if (o instanceof PointWall) o.addWall({ wall: this });
+    this.userInfo.point.forEach((point) => {
+      point.addWall({ wall: this });
     });
+
+    p1.addPoint({ point: p2 });
+    p2.addPoint({ point: p1 });
 
     this.updateGeomWall();
 
@@ -72,26 +77,58 @@ export class Wall extends THREE.Mesh {
     this.geometry = geometry;
   }
 
+  click({ pos }: { pos: THREE.Vector3 }) {
+    start();
+    console.log(this.userInfo);
+
+    outlinePass.selectedObjects = [this];
+
+    function start() {
+      planeMath.position.y = pos.y;
+      planeMath.rotation.set(-Math.PI / 2, 0, 0);
+      planeMath.updateMatrixWorld();
+
+      camOrbit.stopMove = true;
+      mouseEv.stop = true;
+    }
+
+    canvas.onmousemove = (event) => {
+      let intersects = rayIntersect(event, planeMath, 'one');
+      if (intersects.length === 0) return;
+
+      pos = intersects[0].point.clone().sub(pos);
+
+      this.position.add(pos);
+
+      pos = intersects[0].point;
+
+      this.render();
+    };
+
+    canvas.onmouseup = () => {
+      canvas.onmousemove = null;
+      canvas.onmouseup = null;
+
+      camOrbit.stopMove = false;
+      mouseEv.stop = false;
+
+      this.render();
+    };
+  }
+
   delete() {
+    outlinePass.selectedObjects = [];
+    mouseEv.clear();
+
     testInfoMemory();
     console.log(walls.length);
 
     walls = walls.filter((o) => o !== this);
 
-    let p = this.userInfo.point;
-
-    this.userInfo.point.forEach((point) => {
-      if (point instanceof PointWall) point.delWall({ wall: this });
-    });
-
-    this.userInfo.point = [null, null];
+    this.userInfo.point = [];
     this.geometry.dispose();
     scene.remove(this);
     this.render();
-
-    p.forEach((point) => {
-      if (point instanceof PointWall && point.userInfo.wall.length == 0) point.delete();
-    });
 
     testInfoMemory();
     console.log(walls.length);

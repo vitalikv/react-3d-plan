@@ -1,14 +1,18 @@
+import * as THREE from 'three';
 import { canvas } from './index';
-import { rayIntersect } from './core/rayhit';
-import { points } from './plan/point/point';
-import { PointWall } from './plan/point/point';
+import { rayIntersect } from 'three-scene/core/rayhit';
+import { points } from 'three-scene/plan/point/point';
+import { PointWall } from 'three-scene/plan/point/point';
+import { Wall, walls } from 'three-scene/plan/wall/index';
 
 export class Mouse {
   canvas;
   stop;
+  obj: PointWall | Wall | THREE.Mesh | null;
 
   constructor({ canvas }: { canvas: HTMLCanvasElement }) {
     this.stop = false;
+    this.obj = null;
     this.canvas = canvas;
     this.initEvent();
   }
@@ -17,13 +21,9 @@ export class Mouse {
     this.canvas.addEventListener('mousedown', (event) => {
       this.mouseDown(event);
     });
-
-    document.addEventListener('keydown', () => {
-      //deleteKey();
-    });
   }
 
-  mouseDown(event: MouseEvent) {
+  protected mouseDown(event: MouseEvent) {
     if (!event) return;
     if (this.stop) return;
 
@@ -45,11 +45,19 @@ export class Mouse {
 
     if (button === 'right') return;
 
-    let intersects = rayIntersect(event, [...points], 'arr');
+    let intersects = rayIntersect(event, [...points, ...walls], 'arr');
     if (intersects.length === 0) return;
 
     let obj = intersects[0].object;
 
     if (obj instanceof PointWall) obj.click({ pos: intersects[0].point });
+    if (obj instanceof Wall) obj.click({ pos: intersects[0].point });
+
+    this.obj = obj;
+  }
+
+  clear() {
+    this.obj = null;
+    this.stop = false;
   }
 }

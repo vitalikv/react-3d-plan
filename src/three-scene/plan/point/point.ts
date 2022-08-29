@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { canvas, scene, camOrbit, mouseEv, planeMath } from 'three-scene/index';
 import { rayIntersect } from 'three-scene/core/rayhit';
-import { deleteValueFromArrya } from 'three-scene/core/index';
 import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
 
@@ -48,6 +47,7 @@ interface UserInfo {
   readonly tag: string;
   readonly pointWall: boolean;
   wall: Wall[];
+  point: PointWall[];
 }
 
 export class PointWall extends THREE.Mesh {
@@ -56,6 +56,7 @@ export class PointWall extends THREE.Mesh {
     tag: 'pointWall',
     pointWall: true,
     wall: [],
+    point: [],
   };
 
   constructor({ pos }: { pos: THREE.Vector3 }) {
@@ -75,12 +76,20 @@ export class PointWall extends THREE.Mesh {
     points.push(this);
   }
 
+  addPoint({ point }: { point: PointWall }) {
+    this.userInfo.point.push(point);
+  }
+
+  delPoint({ point }: { point: PointWall }) {
+    this.userInfo.point = this.userInfo.point.filter((o) => o !== point);
+  }
+
   addWall({ wall }: { wall: Wall }) {
     this.userInfo.wall.push(wall);
   }
 
   delWall({ wall }: { wall: Wall }) {
-    deleteValueFromArrya({ arr: this.userInfo.wall, obj: wall });
+    this.userInfo.wall = this.userInfo.wall.filter((o) => o !== wall);
   }
 
   click({ pos }: { pos: THREE.Vector3 }) {
@@ -127,16 +136,12 @@ export class PointWall extends THREE.Mesh {
   }
 
   delete() {
-    this.userInfo.wall.forEach((wall) => {
-      if (wall instanceof Wall) {
-        wall.delete();
-      }
-    });
+    // удаляем из точки инфу о соседних точках и о стенах
+    this.userInfo.point.forEach((point) => this.delPoint({ point }));
+    this.userInfo.wall.forEach((wall) => this.delWall({ wall }));
 
-    deleteValueFromArrya({ arr: points, obj: this });
+    points = points.filter((o) => o !== this);
     scene.remove(this);
-
-    this.render();
   }
 
   protected render() {
