@@ -94,6 +94,7 @@ export class PointWall extends THREE.Mesh {
     console.log(this.userInfo);
 
     outlinePass.selectedObjects = [this];
+    this.render();
 
     let offset = this.position.clone().sub(pos);
 
@@ -142,6 +143,8 @@ export class PointWall extends THREE.Mesh {
 
     points = points.filter((o) => o !== this);
     scene.remove(this);
+
+    console.log('delete point', points);
   }
 
   protected render() {

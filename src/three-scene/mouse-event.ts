@@ -55,9 +55,4 @@ export class Mouse {
 
     this.obj = obj;
   }
-
-  clear() {
-    this.obj = null;
-    this.stop = false;
-  }
 }

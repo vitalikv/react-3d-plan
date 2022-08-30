@@ -93,6 +93,7 @@ export class Wall extends THREE.Mesh {
     console.log(this.userInfo);
 
     outlinePass.selectedObjects = [this];
+    this.render();
 
     function start() {
       planeMath.position.y = pos.y;
@@ -128,11 +129,8 @@ export class Wall extends THREE.Mesh {
   }
 
   delete() {
-    outlinePass.selectedObjects = [];
-    mouseEv.clear();
-
     testInfoMemory();
-    console.log(walls.length);
+    console.trace(walls.length);
 
     walls = walls.filter((o) => o !== this);
 

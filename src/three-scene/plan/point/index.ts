@@ -16,7 +16,7 @@ export function deletePointBtn({ point }: { point: PointWall }) {
   if (p.length > 2) return;
 
   outlinePass.selectedObjects = [];
-  mouseEv.clear();
+  mouseEv.obj = null;
 
   point.delete();
 
@@ -60,12 +60,14 @@ export function nearPoint({ point }: { point: PointWall }) {
 }
 
 // закончили действия с перетаскиваемой pointWall
-export function finishSelectPoint({ obj }: { obj: PointWall }) {
+export function finishSelectPoint({ obj, tool }: { obj: PointWall; tool?: boolean }) {
   let o = rayFromPointToObj({ obj: obj, arr: points });
   let w2 = { divide: false };
 
   // точка состыковалась с точкой
   if (o !== null && o instanceof PointWall) {
+    outlinePass.selectedObjects = [];
+    mouseEv.obj = null;
     let w = obj.userInfo.wall;
 
     // получаем соседние точки
@@ -105,10 +107,12 @@ export function finishSelectPoint({ obj }: { obj: PointWall }) {
     // назначаем новой точки новые стены
     for (let i = 0; i < w.length; i++) o.addWall({ wall: w[i] });
 
-    if (o.userInfo.wall.length === 0) o.delete();
+    if (o.userInfo.wall.length === 0 && !tool) o.delete();
 
     camOrbit.render();
   } else {
     //w2 = this.divideWall({obj: obj});
   }
+
+  return o;
 }
