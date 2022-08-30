@@ -9,6 +9,8 @@ export let walls: Wall[] = [];
 
 let matDefault = new THREE.MeshStandardMaterial({ color: 0xe3e3e5, wireframe: false });
 
+let idWall = 1;
+
 interface UserInfo {
   id: number;
   readonly tag: string;
@@ -30,16 +32,17 @@ export class Wall extends THREE.Mesh {
     this.initWall({ p1, p2 });
   }
 
-  protected initWall({ p1, p2 }: { p1: PointWall; p2: PointWall }) {
-    this.userInfo.id = 0;
+  protected initWall({ p1, p2, id }: { p1: PointWall; p2: PointWall; id?: number }) {
+    if (!id) {
+      id = idWall;
+      idWall++;
+    }
+    this.userInfo.id = id;
     this.userInfo.point = [p1, p2];
 
     this.userInfo.point.forEach((point) => {
       point.addWall({ wall: this });
     });
-
-    p1.addPoint({ point: p2 });
-    p2.addPoint({ point: p1 });
 
     this.updateGeomWall();
 
@@ -48,6 +51,14 @@ export class Wall extends THREE.Mesh {
     walls.push(this);
 
     this.render();
+  }
+
+  addPoint({ point }: { point: PointWall }) {
+    this.userInfo.point.push(point);
+  }
+
+  delPoint({ point }: { point: PointWall }) {
+    this.userInfo.point = this.userInfo.point.filter((o) => o !== point);
   }
 
   updateGeomWall() {

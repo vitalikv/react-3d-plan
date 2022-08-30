@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { canvas, scene, camOrbit, mouseEv, planeMath } from 'three-scene/index';
 import { rayIntersect } from 'three-scene/core/rayhit';
+import { nearPoint, finishSelectPoint } from 'three-scene/plan/point/index';
 import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
 
@@ -42,12 +43,13 @@ function geometryPoint(): THREE.BufferGeometry {
   return geometry;
 }
 
+let idPoint = 1;
+
 interface UserInfo {
   id: number;
   readonly tag: string;
   readonly pointWall: boolean;
   wall: Wall[];
-  point: PointWall[];
 }
 
 export class PointWall extends THREE.Mesh {
@@ -56,7 +58,6 @@ export class PointWall extends THREE.Mesh {
     tag: 'pointWall',
     pointWall: true,
     wall: [],
-    point: [],
   };
 
   constructor({ pos }: { pos: THREE.Vector3 }) {
@@ -69,19 +70,15 @@ export class PointWall extends THREE.Mesh {
   }
 
   protected initObj({ id }: { id?: number } = {}) {
-    this.userInfo.id = id ? id : 0;
+    if (!id) {
+      id = idPoint;
+      idPoint++;
+    }
+    this.userInfo.id = id;
 
     scene.add(this);
 
     points.push(this);
-  }
-
-  addPoint({ point }: { point: PointWall }) {
-    this.userInfo.point.push(point);
-  }
-
-  delPoint({ point }: { point: PointWall }) {
-    this.userInfo.point = this.userInfo.point.filter((o) => o !== point);
   }
 
   addWall({ wall }: { wall: Wall }) {
@@ -98,6 +95,8 @@ export class PointWall extends THREE.Mesh {
 
     outlinePass.selectedObjects = [this];
 
+    let offset = this.position.clone().sub(pos);
+
     function start() {
       planeMath.position.y = pos.y;
       planeMath.rotation.set(-Math.PI / 2, 0, 0);
@@ -111,11 +110,11 @@ export class PointWall extends THREE.Mesh {
       let intersects = rayIntersect(event, planeMath, 'one');
       if (intersects.length === 0) return;
 
-      pos = intersects[0].point.clone().sub(pos);
+      let pos = new THREE.Vector3().addVectors(intersects[0].point, offset);
+      this.position.copy(pos);
 
-      this.position.add(pos);
-
-      pos = intersects[0].point;
+      let newPos = nearPoint({ point: this });
+      if (newPos) this.position.copy(newPos);
 
       this.userInfo.wall.forEach((wall) => {
         if (wall instanceof Wall) wall.updateGeomWall();
@@ -128,6 +127,8 @@ export class PointWall extends THREE.Mesh {
       canvas.onmousemove = null;
       canvas.onmouseup = null;
 
+      finishSelectPoint({ obj: this });
+
       camOrbit.stopMove = false;
       mouseEv.stop = false;
 
@@ -137,7 +138,6 @@ export class PointWall extends THREE.Mesh {
 
   delete() {
     // удаляем из точки инфу о соседних точках и о стенах
-    this.userInfo.point.forEach((point) => this.delPoint({ point }));
     this.userInfo.wall.forEach((wall) => this.delWall({ wall }));
 
     points = points.filter((o) => o !== this);

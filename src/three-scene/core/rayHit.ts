@@ -34,30 +34,25 @@ export function rayIntersect(
 }
 
 // пускаем луч из точки на что-то в сцене
-// export function rayFromPointToObj(params) {
-//   let obj = params.obj;
-//   let arr = params.arr;
+export function rayFromPointToObj({ obj, arr }: { obj: PointWall; arr: PointWall[] }) {
+  obj.updateMatrixWorld();
+  if (!obj.geometry.boundingSphere) obj.geometry.computeBoundingSphere();
+  let posCent = obj.geometry.boundingSphere ? obj.geometry.boundingSphere.center.clone() : new THREE.Vector3();
 
-//   obj.updateMatrixWorld();
-//   obj.geometry.computeBoundingSphere();
+  let pos = obj.localToWorld(posCent);
+  pos.y += 10;
 
-//   let pos = obj.localToWorld(obj.geometry.boundingSphere.center.clone());
-//   pos.y += 10;
+  let arr2 = arr.filter((o) => o !== obj);
 
-//   let arr2 = [];
-//   for (let i = 0; i < arr.length; i++) {
-//     if (arr[i] != obj) arr2.push(arr[i]);
-//   }
+  let ray = new THREE.Raycaster();
+  ray.set(pos, new THREE.Vector3(0, -1, 0));
 
-//   let ray = new THREE.Raycaster();
-//   ray.set(pos, new THREE.Vector3(0, -1, 0));
+  let intersects: THREE.Intersection<PointWall>[] = ray.intersectObjects(arr2, true);
 
-//   let intersects = ray.intersectObjects(arr2, true);
+  let o = null;
+  if (intersects.length > 0) {
+    o = intersects[0].object;
+  }
 
-//   let o = null;
-//   if (intersects.length > 0) {
-//     o = intersects[0].object;
-//   }
-
-//   return o;
-// }
+  return o;
+}
