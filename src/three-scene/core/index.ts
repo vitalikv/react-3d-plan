@@ -11,6 +11,12 @@ export function deleteValueFromArrya({ arr, obj }: { arr: THREE.Mesh[]; obj: THR
   }
 }
 
+// function deleteValueFromArrya({arr, obj})
+// {
+// 	let n = arr.indexOf(obj);
+// 	if (n > -1) arr.splice(n, 1);
+// }
+
 export function crPlaneMath(): THREE.Mesh {
   let geometry = new THREE.PlaneGeometry(10000, 10000);
   let material = new THREE.MeshPhongMaterial({

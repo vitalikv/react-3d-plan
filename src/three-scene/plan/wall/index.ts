@@ -128,9 +128,10 @@ export class Wall extends THREE.Mesh {
     };
   }
 
+  // удаляем только стену (без точек)
   delete() {
     testInfoMemory();
-    console.trace(walls.length);
+    console.log(walls.length);
 
     walls = walls.filter((o) => o !== this);
 
@@ -141,6 +142,17 @@ export class Wall extends THREE.Mesh {
 
     testInfoMemory();
     console.log(walls.length);
+  }
+
+  // удаляем стену и очищаем инфу в точках об этой стене
+  deleteWallPoint() {
+    outlinePass.selectedObjects = [];
+    this.userInfo.point.forEach((point) => {
+      point.delWall({ wall: this });
+      if (point.userInfo.wall.length === 0) point.delete();
+    });
+
+    this.delete();
   }
 
   protected render() {
