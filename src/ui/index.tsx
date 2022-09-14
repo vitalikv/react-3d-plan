@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggle } from './store/btnCamSlice';
 import * as Tscene from '../three-scene/index';
+import PanelR from 'ui/right-panel/index';
 
 declare module 'react' {
   export interface HTMLAttributes<T> {
@@ -66,17 +67,6 @@ const styles: any = {
     backgroundImage: '-webkit-linear-gradient(top, #ffffff 0%, #e3e3e3 100%)',
     boxShadow: '0px 0px 2px #bababa, inset 0px 0px 1px #ffffff',
   },
-
-  panelR: {
-    position: 'absolute',
-    top: '40px',
-    right: 0,
-    bottom: 0,
-    width: '310px',
-    boxSizing: 'border-box',
-    background: '#F0F0F0',
-    borderLeft: '1px solid #D1D1D1',
-  },
 };
 
 export default function Container() {
@@ -100,9 +90,7 @@ export default function Container() {
         <div className="title">Test 3D</div>
       </div>
 
-      <div nameid="panelR" style={styles.panelR}>
-        <div nameid="wrapLevel"></div>
-      </div>
+      <PanelR />
 
       <div style={styles.wrapBtnCam}>
         <div nameid="cam2D" onClick={(e) => clickBtn({ type: '2D' })} style={{ ...styles.btnCam, ...styles.btnGradient, display: stateCam[0].display }}>

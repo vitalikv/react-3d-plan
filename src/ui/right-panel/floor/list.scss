@@ -1,0 +1,21 @@
+$color-fff: rgb(255, 255, 255);
+
+.listFloor {
+  width: auto;
+  height: 250px;
+  margin: 10px;
+  border-radius: 3px;
+  background: $color-fff;
+  border: 1px solid #ccc;
+  user-select: none;
+
+  .item {
+    padding: 3px 6px;
+    margin: 3px;
+    font-size: 15px;
+    color: #666;
+    border: 1px solid #ccc;
+    background: #ffffff;
+    cursor: pointer;
+  }
+}

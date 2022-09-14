@@ -8,22 +8,16 @@ import { PointWall } from 'three-scene/plan/point/point';
 import { initComposerRender } from 'three-scene/core/composer-render';
 import { initDeleteObj } from 'three-scene/delete';
 
-interface Param {
-  ready: () => void;
-}
-
 export let container: HTMLElement | null, canvas: HTMLCanvasElement, scene: THREE.Scene;
 export let mouseEv: Mouse, camOrbit: CAM.CameraOrbit;
 export let planeMath: THREE.Mesh;
 export let renderer: THREE.WebGLRenderer;
 let ambientLight, light;
 
-export function init({ ready }: Param): void {
+export function init({ ready }: { ready: () => void }) {
   container = document.body.querySelector('[nameId="containerScene2"]');
 
   if (!container) return;
-  //   const container = document.createElement('div');
-  //   document.body.appendChild(container);
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0xffffff);

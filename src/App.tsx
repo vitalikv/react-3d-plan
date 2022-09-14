@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 
 //import logo from './logo.svg';
 
-import BtnCam from './ui/btn-cam';
+import Main from './ui/index';
 import BtnPoint from './ui/btn-point';
 import Slider from './ui/slider/index';
 import { store } from './ui/store/store';
@@ -12,7 +12,7 @@ function App() {
   return (
     <div>
       <Provider store={store}>
-        <BtnCam />
+        <Main />
       </Provider>
 
       <BtnPoint />

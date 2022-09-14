@@ -3,6 +3,7 @@ import { rayFromPointToObj } from 'three-scene/core/rayhit';
 import { points, PointWall } from 'three-scene/plan/point/point';
 import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
+import { convertArray } from 'three/src/animation/AnimationUtils';
 
 export function deletePointBtn({ point }: { point: PointWall }) {
   let w = point.userInfo.wall;
