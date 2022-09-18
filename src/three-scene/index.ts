@@ -8,6 +8,8 @@ import { PointWall } from 'three-scene/plan/point/point';
 import { initComposerRender } from 'three-scene/core/composer-render';
 import { initDeleteObj } from 'three-scene/delete';
 
+import { apiThreeToUi } from 'api/three-ui';
+
 export let container: HTMLElement | null, canvas: HTMLCanvasElement, scene: THREE.Scene;
 export let mouseEv: Mouse, camOrbit: CAM.CameraOrbit;
 export let planeMath: THREE.Mesh;
@@ -83,4 +85,6 @@ export function init({ ready }: { ready: () => void }) {
   camOrbit.render();
 
   if (ready) ready();
+
+  apiThreeToUi.readyThree();
 }

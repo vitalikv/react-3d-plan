@@ -1,4 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Wall } from 'three-scene/plan/wall/index';
+import { PointWall } from 'three-scene/plan/point/point';
 
 // 1. запись
 // type Item = { name: string; act: boolean };
@@ -14,7 +16,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 //const initialState:List = [];
 
 // 5. самая коротка запись
-const initialState: { name: string; act: boolean }[] = [];
+//const initialState: { name: string; act: boolean }[] = [];
+
+type LevelItem = { act: boolean; name: string };
+const initialState: LevelItem[] = [];
 
 const slice = createSlice({
   name: 'level-list',
@@ -22,17 +27,19 @@ const slice = createSlice({
   initialState,
 
   reducers: {
-    init(state) {
-      state = [
-        { name: '1 level', act: true },
-        { name: '2 level', act: false },
-        { name: '3 level', act: false },
-      ];
+    init(state, action: PayloadAction<LevelItem[]>) {
+      state = [];
+      state.push(...action.payload);
+
+      return state;
     },
-    select(state, action: PayloadAction<string>) {
+    select(state, action: PayloadAction<number>) {
       state.forEach((i) => (i.act = false));
-      state[1].act = true;
-      console.log('level-list', state);
+      state.forEach((i, index) => {
+        if (index === action.payload) {
+          i.act = true;
+        }
+      });
     },
   },
 });

@@ -1,5 +1,5 @@
 import { store } from 'ui/store/store';
-import { toggle } from 'ui/store/btnCamSlice';
+import { toggle } from 'ui/store/slice/btnCamSlice';
 
 export function crBtnPointWall({ container, canvas }: { container: HTMLElement; canvas: HTMLCanvasElement }): void {
   //let el: HTMLElement | null = Tscene.container.querySelector('[nameId="blockButton_1"]');

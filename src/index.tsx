@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 
 import * as Thrscene from './three-scene/index';
 
-function startReact(): void {
+export function initReact(): void {
   const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
   root.render(
     //<React.StrictMode>
@@ -15,6 +15,6 @@ function startReact(): void {
   );
 }
 
-Thrscene.init({ ready: startReact });
+Thrscene.init({ ready: initReact });
 
 reportWebVitals();

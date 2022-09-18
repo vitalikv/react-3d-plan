@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { toggle } from 'ui/store/btnCamSlice';
+import { toggle } from 'ui/store/slice/btnCamSlice';
 import * as Tscene from 'three-scene/index';
 
 const styles: any = {

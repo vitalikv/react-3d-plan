@@ -1,32 +1,48 @@
+import { store } from 'ui/store/store';
+import { init, select } from 'ui/store/slice/slice-level-list';
+import { useAppDispatch, useAppSelector } from 'ui/store/hook';
 import { Wall } from 'three-scene/plan/wall/index';
 import { PointWall } from 'three-scene/plan/point/point';
 
-export function changeLeval() {
-  console.log(7777);
-}
+type LevelItem = { name: string; h: { y1: number; y2: number }; p: PointWall[]; w: Wall[] };
 
-let arr = [
-  { name: 'level-1', h: { y1: 0, y2: 2.7 } },
-  { name: 'level-2', h: { y1: 2.7, y2: 5.4 } },
-  { name: 'level-3', h: { y1: 5.4, y2: 8.1 } },
-];
-
-export class Level {
+class Level {
   actId = 0;
-  levels = [{ name: '', h: { y1: 0, y2: 0 }, p: [PointWall], w: [Wall] }];
+  levels: LevelItem[];
 
-  constructor({ arr }: { arr: any }) {
-    this.actId = 0;
+  constructor() {
+    this.levels = [];
 
-    this.initLevel({ arr });
+    console.log('class Level');
   }
 
-  initLevel({ arr }: { arr: any }) {
-    for (let i = 0; i < arr.length; i++) {
-      this.levels[i] = { name: arr[i].name, h: { y1: arr[i].h.y1, y2: arr[i].h.y2 }, p: [], w: [] };
-      console.log(this.levels[i]);
-    }
+  initLevel() {
+    let arr = [
+      { name: 'level-1', h: { y1: 0, y2: 2.7 }, p: [], w: [] },
+      { name: 'level-2', h: { y1: 2.7, y2: 5.4 }, p: [], w: [] },
+      { name: 'level-3', h: { y1: 5.4, y2: 8.1 }, p: [], w: [] },
+    ];
+
+    this.levels = arr;
+    this.actId = 0;
+    this.initReactLevelList({ arr, actId: this.actId });
+  }
+
+  initReactLevelList({ arr, actId }: { arr: LevelItem[]; actId: number }) {
+    let arr2 = arr.map((i) => {
+      return { act: false, name: i.name };
+    });
+
+    arr2[actId].act = true;
+
+    //const dispatch = useAppDispatch();
+    store.dispatch(init(arr2));
+  }
+
+  changeLevelAct({ id }: { id: number }) {
+    this.actId = id;
+    console.log('this.actId', this.actId);
   }
 }
 
-new Level({ arr });
+export const level = new Level();
