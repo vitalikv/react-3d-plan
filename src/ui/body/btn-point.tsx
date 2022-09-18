@@ -1,8 +1,8 @@
 import React from 'react';
-import { canvas } from '../three-scene/index';
-import * as PointIndex from '../three-scene/plan/point/point-cat';
+import { canvas } from 'three-scene/index';
+import * as PointIndex from 'three-scene/plan/point/point-cat';
 
-export default function Container() {
+export default function BtnPoint2() {
   function clickBtn() {
     promise_1().then((data) => {
       PointIndex.addPointFromCat({ event: data.event });

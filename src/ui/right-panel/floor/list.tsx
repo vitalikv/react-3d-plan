@@ -1,5 +1,5 @@
-import { MouseEvent, useState } from 'react';
-import 'ui/right-panel/floor/list.scss';
+import { MouseEvent, useState, useEffect } from 'react';
+import './list.scss';
 import { changeLeval } from 'three-scene/plan/level/index';
 
 export default function ListFloor() {
@@ -10,6 +10,10 @@ export default function ListFloor() {
   ];
 
   const [items, setItem] = useState(arr);
+
+  useEffect(() => {
+    changeLeval();
+  });
 
   function clickItem({ event, id }: { event: MouseEvent; id: number }) {
     console.log(event.currentTarget.textContent);
@@ -33,7 +37,6 @@ export default function ListFloor() {
             key={index}
             onClick={(event) => {
               clickItem({ event, id: index });
-              changeLeval();
             }}
             style={item.act ? { backgroundColor: 'rgb(167, 207, 242)' } : { backgroundColor: '#ffffff' }}
           >

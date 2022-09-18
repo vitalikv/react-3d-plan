@@ -14,7 +14,7 @@ const styles: any = {
 };
 
 export default function PanelR() {
-  let show = false;
+  let show = true;
 
   return (
     <div nameid="panelR" style={styles.panelR}>

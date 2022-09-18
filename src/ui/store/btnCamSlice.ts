@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const btnCamSlice = createSlice({
+const slice = createSlice({
   name: 'btnCam',
 
   initialState: [
@@ -23,6 +23,6 @@ const btnCamSlice = createSlice({
   },
 });
 
-export const { toggle } = btnCamSlice.actions;
+export const { toggle } = slice.actions;
 
-export default btnCamSlice.reducer;
+export default slice.reducer;
