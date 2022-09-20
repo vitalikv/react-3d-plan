@@ -1,6 +1,6 @@
-import { scene, camOrbit, mouseEv } from 'three-scene/index';
+import { scene, camOrbit, mouseEv, level } from 'three-scene/index';
 import { rayFromPointToObj } from 'three-scene/core/rayhit';
-import { points, PointWall } from 'three-scene/plan/point/point';
+import { PointWall } from 'three-scene/plan/point/point';
 import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
 import { convertArray } from 'three/src/animation/AnimationUtils';
@@ -45,6 +45,7 @@ export function deletePointBtn({ point }: { point: PointWall }) {
 export function nearPoint({ point }: { point: PointWall }) {
   let newPos = null;
   let pos = point.position.clone();
+  let points = level.getArrPointWall();
 
   for (let i = 0; i < points.length; i++) {
     if (points[i] === point) continue;
@@ -62,7 +63,7 @@ export function nearPoint({ point }: { point: PointWall }) {
 
 // закончили действия с перетаскиваемой pointWall
 export function finishSelectPoint({ obj, tool }: { obj: PointWall; tool?: boolean }) {
-  let o = rayFromPointToObj({ obj: obj, arr: points });
+  let o = rayFromPointToObj({ obj, arr: level.getArrPointWall() });
   let w2 = { divide: false };
 
   // точка состыковалась с точкой

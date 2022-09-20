@@ -4,8 +4,9 @@ import { rayIntersect } from 'three-scene/core/rayhit';
 import { nearPoint, finishSelectPoint } from 'three-scene/plan/point/index';
 import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
+import { level } from 'three-scene/index';
 
-export let points: PointWall[] = [];
+//export let points: PointWall[] = [];
 
 let matDefault = new THREE.MeshStandardMaterial({
   color: 0x222222,
@@ -78,7 +79,7 @@ export class PointWall extends THREE.Mesh {
 
     scene.add(this);
 
-    points.push(this);
+    level.addPoint({ point: this });
   }
 
   addWall({ wall }: { wall: Wall }) {
@@ -141,10 +142,10 @@ export class PointWall extends THREE.Mesh {
     // удаляем из точки инфу о соседних точках и о стенах
     this.userInfo.wall.forEach((wall) => this.delWall({ wall }));
 
-    points = points.filter((o) => o !== this);
+    level.delPoint({ point: this });
     scene.remove(this);
 
-    console.log('delete point', points);
+    console.log('delete level', level.levels);
   }
 
   protected render() {

@@ -2,7 +2,7 @@ import { MouseEvent, useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from 'ui/store/hook';
 import { select } from 'ui/store/slice/slice-level-list';
 import './list.scss';
-import { level } from 'three-scene/plan/level/index';
+import { level } from 'three-scene/index';
 
 export default function ListFloor() {
   const dispatch = useAppDispatch();

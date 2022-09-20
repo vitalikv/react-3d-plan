@@ -7,6 +7,7 @@ import { crPlaneMath } from 'three-scene/core/index';
 import { PointWall } from 'three-scene/plan/point/point';
 import { initComposerRender } from 'three-scene/core/composer-render';
 import { initDeleteObj } from 'three-scene/delete';
+import { Level } from 'three-scene/plan/level/index';
 
 import { apiThreeToUi } from 'api/three-ui';
 
@@ -14,6 +15,7 @@ export let container: HTMLElement | null, canvas: HTMLCanvasElement, scene: THRE
 export let mouseEv: Mouse, camOrbit: CAM.CameraOrbit;
 export let planeMath: THREE.Mesh;
 export let renderer: THREE.WebGLRenderer;
+export let level: Level;
 let ambientLight, light;
 
 export function init({ ready }: { ready: () => void }) {
@@ -72,6 +74,9 @@ export function init({ ready }: { ready: () => void }) {
 
   //planeMath
   planeMath = crPlaneMath();
+
+  // level
+  level = new Level();
 
   //wall
   let p1 = new PointWall({ pos: new THREE.Vector3(-2, 0, 1) });

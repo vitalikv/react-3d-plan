@@ -6,17 +6,19 @@ import { PointWall } from 'three-scene/plan/point/point';
 
 type LevelItem = { name: string; h: { y1: number; y2: number }; p: PointWall[]; w: Wall[] };
 
-class Level {
+export class Level {
   actId = 0;
   levels: LevelItem[];
 
   constructor() {
+    this.actId = 0;
     this.levels = [];
 
+    this.initLevel();
     console.log('class Level');
   }
 
-  initLevel() {
+  protected initLevel() {
     let arr = [
       { name: 'level-1', h: { y1: 0, y2: 2.7 }, p: [], w: [] },
       { name: 'level-2', h: { y1: 2.7, y2: 5.4 }, p: [], w: [] },
@@ -25,24 +27,54 @@ class Level {
 
     this.levels = arr;
     this.actId = 0;
-    this.initReactLevelList({ arr, actId: this.actId });
+    //this.initReactLevelList();
   }
 
-  initReactLevelList({ arr, actId }: { arr: LevelItem[]; actId: number }) {
-    let arr2 = arr.map((i) => {
+  initReactLevelList() {
+    let arr = this.levels.map((i) => {
       return { act: false, name: i.name };
     });
 
-    arr2[actId].act = true;
+    arr[this.actId].act = true;
 
     //const dispatch = useAppDispatch();
-    store.dispatch(init(arr2));
+    store.dispatch(init(arr));
   }
 
   changeLevelAct({ id }: { id: number }) {
     this.actId = id;
     console.log('this.actId', this.actId);
   }
-}
 
-export const level = new Level();
+  getArrObjs() {
+    return [...this.levels[this.actId].p, ...this.levels[this.actId].w];
+  }
+
+  getArrWall() {
+    return this.levels[this.actId].w;
+  }
+
+  getArrPointWall() {
+    return this.levels[this.actId].p;
+  }
+
+  addPoint({ point }: { point: PointWall }) {
+    this.levels[this.actId].p.push(point);
+  }
+
+  delPoint({ point }: { point: PointWall }) {
+    //this.levels[this.actId].p = this.levels[this.actId].p.filter((o) => o !== point);
+    let n = this.levels[this.actId].p.indexOf(point);
+    if (n > -1) this.levels[this.actId].p.splice(n, 1);
+  }
+
+  addWall({ wall }: { wall: Wall }) {
+    this.levels[this.actId].w.push(wall);
+  }
+
+  delWall({ wall }: { wall: Wall }) {
+    //this.levels[this.actId].w = this.levels[this.actId].w.filter((o) => o !== wall);
+    let n = this.levels[this.actId].w.indexOf(wall);
+    if (n > -1) this.levels[this.actId].w.splice(n, 1);
+  }
+}

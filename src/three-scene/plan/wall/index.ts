@@ -4,8 +4,9 @@ import { rayIntersect } from 'three-scene/core/rayhit';
 import { PointWall } from 'three-scene/plan/point/point';
 import { testInfoMemory } from 'three-scene/core/index';
 import { outlinePass } from 'three-scene/core/composer-render';
+import { level } from 'three-scene/index';
 
-export let walls: Wall[] = [];
+//export let walls: Wall[] = [];
 
 let matDefault = new THREE.MeshStandardMaterial({ color: 0xe3e3e5, wireframe: false });
 
@@ -48,7 +49,7 @@ export class Wall extends THREE.Mesh {
 
     scene.add(this);
 
-    walls.push(this);
+    level.addWall({ wall: this });
 
     this.render();
   }
@@ -131,9 +132,8 @@ export class Wall extends THREE.Mesh {
   // удаляем только стену (без точек)
   delete() {
     testInfoMemory();
-    console.log(walls.length);
 
-    walls = walls.filter((o) => o !== this);
+    level.delWall({ wall: this });
 
     this.userInfo.point = [];
     this.geometry.dispose();
@@ -141,7 +141,7 @@ export class Wall extends THREE.Mesh {
     this.render();
 
     testInfoMemory();
-    console.log(walls.length);
+    console.log(level.levels[level.actId].w);
   }
 
   // удаляем стену и очищаем инфу в точках об этой стене

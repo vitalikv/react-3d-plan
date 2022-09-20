@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { canvas } from './index';
 import { rayIntersect } from 'three-scene/core/rayhit';
-import { points } from 'three-scene/plan/point/point';
 import { PointWall } from 'three-scene/plan/point/point';
-import { Wall, walls } from 'three-scene/plan/wall/index';
+import { Wall } from 'three-scene/plan/wall/index';
+import { level } from 'three-scene/index';
 
 export class Mouse {
   canvas;
@@ -45,7 +45,7 @@ export class Mouse {
 
     if (button === 'right') return;
 
-    let intersects = rayIntersect(event, [...points, ...walls], 'arr');
+    let intersects = rayIntersect(event, level.getArrObjs(), 'arr');
     if (intersects.length === 0) return;
 
     let obj = intersects[0].object;

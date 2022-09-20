@@ -1,5 +1,5 @@
 //import { initThreejs } from 'threejs';
-import { level } from 'three-scene/plan/level/index';
+import { level } from 'three-scene/index';
 
 class ApiUiToThree {
   readyUi() {
@@ -10,7 +10,7 @@ class ApiUiToThree {
   }
 
   loadLevel() {
-    level.initLevel();
+    level.initReactLevelList();
   }
 }
 
