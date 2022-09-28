@@ -21,7 +21,11 @@
     "jsx": "react-jsx",
     "baseUrl": "src"
   },
+  "watchOptions": {
+    "excludeDirectories": ["public"],
+  },
   "include": [
     "src"
-  ]
+  ],
+  "exclude": ["node_modules", "build", "public",]
 }

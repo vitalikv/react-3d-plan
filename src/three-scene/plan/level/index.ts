@@ -46,6 +46,14 @@ export class Level {
     console.log('this.actId', this.actId);
   }
 
+  getPosY1() {
+    return this.levels[this.actId].h.y1;
+  }
+
+  getHeight() {
+    return this.levels[this.actId].h.y2 - this.levels[this.actId].h.y1;
+  }
+
   getArrObjs() {
     return [...this.levels[this.actId].p, ...this.levels[this.actId].w];
   }

@@ -17,6 +17,7 @@ interface UserInfo {
   readonly tag: string;
   readonly wall: boolean;
   point: PointWall[];
+  h: number;
 }
 
 export class Wall extends THREE.Mesh {
@@ -25,6 +26,7 @@ export class Wall extends THREE.Mesh {
     tag: 'wall',
     wall: true,
     point: [],
+    h: 0,
   };
 
   constructor({ p1, p2 }: { p1: PointWall; p2: PointWall }) {
@@ -33,7 +35,7 @@ export class Wall extends THREE.Mesh {
     this.initWall({ p1, p2 });
   }
 
-  protected initWall({ p1, p2, id }: { p1: PointWall; p2: PointWall; id?: number }) {
+  protected initWall({ p1, p2, id, h }: { p1: PointWall; p2: PointWall; id?: number; h?: number }) {
     if (!id) {
       id = idWall;
       idWall++;
@@ -45,7 +47,10 @@ export class Wall extends THREE.Mesh {
       point.addWall({ wall: this });
     });
 
-    this.updateGeomWall();
+    if (!h) h = level.getHeight();
+    this.userInfo.h = h;
+
+    this.updateGeomWall({ h });
 
     scene.add(this);
 
@@ -62,7 +67,7 @@ export class Wall extends THREE.Mesh {
     this.userInfo.point = this.userInfo.point.filter((o) => o !== point);
   }
 
-  updateGeomWall() {
+  updateGeomWall({ h }: { h?: number } = {}) {
     let [p1, p2] = this.userInfo.point;
     if (!(p1 instanceof PointWall) || !(p2 instanceof PointWall)) return;
 
@@ -80,8 +85,9 @@ export class Wall extends THREE.Mesh {
     arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z + 0);
     arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z).add(offsetR);
 
+    if (!h) h = this.userInfo.h;
     let shape = new THREE.Shape(arr);
-    let geometry = new THREE.ExtrudeGeometry(shape, { bevelEnabled: false, depth: 3 });
+    let geometry = new THREE.ExtrudeGeometry(shape, { bevelEnabled: false, depth: h });
     geometry.rotateX(-Math.PI / 2);
     geometry.translate(0, p1.position.y, 0);
 

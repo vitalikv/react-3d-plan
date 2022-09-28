@@ -4,9 +4,10 @@ import { nearPoint, finishSelectPoint } from 'three-scene/plan/point/index';
 import { PointWall } from './point';
 import { Wall } from 'three-scene/plan/wall/index';
 import { deletePointBtn } from 'three-scene/plan/point/index';
+import { level } from 'three-scene/index';
 
 export function addPointFromCat({ event, obj1 }: { event: MouseEvent; obj1?: PointWall }): void {
-  planeMath.position.y = 0;
+  planeMath.position.y = level.getPosY1();
   planeMath.rotation.set(-Math.PI / 2, 0, 0);
   planeMath.updateMatrixWorld();
 
