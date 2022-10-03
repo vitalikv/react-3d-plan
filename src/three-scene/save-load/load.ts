@@ -1,5 +1,5 @@
 export async function loadLocalFile() {
-  let url = 't/file.json';
+  let url = 'http://react/react-3d-plan/php/loadLocal.php';
 
   let response = await fetch(url, {
     method: 'GET',

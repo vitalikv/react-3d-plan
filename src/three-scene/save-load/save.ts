@@ -20,7 +20,7 @@ export async function saveLocalFile() {
   let json = { save: true, test: 'da' };
   let str = JSON.stringify(saveScene());
 
-  let url = 'http://react/react-3d-plan/public/t/saveLocal.php';
+  let url = 'http://react/react-3d-plan/php/saveLocal.php';
 
   let response = await fetch(url, {
     method: 'POST',

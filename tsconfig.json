@@ -22,10 +22,10 @@
     "baseUrl": "src"
   },
   "watchOptions": {
-    "excludeDirectories": ["public"],
+    //"excludeDirectories": ["_build", "public"],
   },
   "include": [
     "src"
   ],
-  "exclude": ["node_modules", "build", "public",]
+  //"exclude": ["node_modules", "build", "public",]
 }
