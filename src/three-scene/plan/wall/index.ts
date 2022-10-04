@@ -29,13 +29,13 @@ export class Wall extends THREE.Mesh {
     h: 0,
   };
 
-  constructor({ p1, p2 }: { p1: PointWall; p2: PointWall }) {
+  constructor({ id, p1, p2 }: { id?: number; p1: PointWall; p2: PointWall }) {
     super(new THREE.BufferGeometry(), matDefault);
 
-    this.initWall({ p1, p2 });
+    this.initWall({ id, p1, p2 });
   }
 
-  protected initWall({ p1, p2, id, h }: { p1: PointWall; p2: PointWall; id?: number; h?: number }) {
+  protected initWall({ id, p1, p2, h }: { id?: number; p1: PointWall; p2: PointWall; h?: number }) {
     if (!id) {
       id = idWall;
       idWall++;

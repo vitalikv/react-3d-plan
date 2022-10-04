@@ -61,10 +61,10 @@ export class PointWall extends THREE.Mesh {
     wall: [],
   };
 
-  constructor({ pos }: { pos: THREE.Vector3 }) {
+  constructor({ id, pos }: { id?: number; pos: THREE.Vector3 }) {
     super(geomPoint, matDefault);
 
-    this.initObj();
+    this.initObj({ id });
 
     this.position.copy(pos);
     this.render();

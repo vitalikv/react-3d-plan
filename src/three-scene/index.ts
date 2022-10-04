@@ -79,9 +79,9 @@ export function init({ ready }: { ready: () => void }) {
   level = new Level();
 
   //wall
-  let p1 = new PointWall({ pos: new THREE.Vector3(-2, 0, 1) });
-  let p2 = new PointWall({ pos: new THREE.Vector3(4, 0, 1) });
-  new Wall({ p1, p2 });
+  // let p1 = new PointWall({ pos: new THREE.Vector3(-2, 0, 1) });
+  // let p2 = new PointWall({ pos: new THREE.Vector3(4, 0, 1) });
+  // new Wall({ p1, p2 });
 
   //deleteObj
   initDeleteObj();

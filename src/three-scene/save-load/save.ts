@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { level } from 'three-scene/index';
+import { IFileJSON } from 'three-scene/save-load/interface';
 
 export function saveLocalFile2() {
   let json = { save: true, test: 'da' };
@@ -36,20 +37,40 @@ export async function saveLocalFile() {
 
 function saveScene() {
   let arr = level.levels;
-  //this.levels[this.actId].p
 
-  let json: { level: { point: [{ id: number; pos: THREE.Vector3 }] }[] } = { level: [] };
+  let json: IFileJSON = { level: [] };
 
   for (let i = 0; i < arr.length; i++) {
-    json.level[i] = { point: [{ id: 0, pos: new THREE.Vector3() }] };
+    json.level[i] = {} as any;
+
+    json.level[i].name = arr[i].name;
+    json.level[i].h = arr[i].h;
+
+    json.level[i].point = [];
+    json.level[i].wall = [];
+
     for (let i2 = 0; i2 < arr[i].p.length; i2++) {
       json.level[i].point[i2] = { id: 0, pos: new THREE.Vector3() };
+
       json.level[i].point[i2].id = arr[i].p[i2].userInfo.id;
       json.level[i].point[i2].pos = arr[i].p[i2].position;
 
       //json.level[i].point[i2].joinP = arr[i].p[i2].userData.point.joinP.map((o) => o.userData.id);
     }
+
+    for (let i2 = 0; i2 < arr[i].w.length; i2++) {
+      json.level[i].wall![i2] = {} as any;
+
+      json.level[i].wall![i2].id = arr[i].w[i2].userInfo.id;
+
+      let p: { id: number; pos: THREE.Vector3 }[] = [];
+      p[0] = { id: arr[i].w[i2].userInfo.point[0].userInfo.id, pos: arr[i].w[i2].userInfo.point[0].position };
+      p[1] = { id: arr[i].w[i2].userInfo.point[1].userInfo.id, pos: arr[i].w[i2].userInfo.point[1].position };
+
+      json.level[i].wall![i2].point = p;
+    }
   }
+
   console.log(json);
   return json;
 }
