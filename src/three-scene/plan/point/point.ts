@@ -46,6 +46,10 @@ function geometryPoint(): THREE.BufferGeometry {
 
 let idPoint = 1;
 
+export function setIdWallPoint(id: number) {
+  idPoint = id;
+}
+
 interface UserInfo {
   id: number;
   readonly tag: string;
@@ -73,8 +77,9 @@ export class PointWall extends THREE.Mesh {
   protected initObj({ id }: { id?: number } = {}) {
     if (!id) {
       id = idPoint;
-      idPoint++;
+      setIdWallPoint(idPoint + 1);
     }
+
     this.userInfo.id = id;
 
     scene.add(this);

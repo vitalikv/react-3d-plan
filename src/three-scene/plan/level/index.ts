@@ -1,14 +1,14 @@
+import { scene, camOrbit } from 'three-scene/index';
 import { store } from 'ui/store/store';
-import { init, select } from 'ui/store/slice/slice-level-list';
-import { useAppDispatch, useAppSelector } from 'ui/store/hook';
-import { Wall } from 'three-scene/plan/wall/index';
-import { PointWall } from 'three-scene/plan/point/point';
+import { init } from 'ui/store/slice/slice-level-list';
+import { Wall, setIdWall } from 'three-scene/plan/wall/index';
+import { PointWall, setIdWallPoint } from 'three-scene/plan/point/point';
 
-type LevelItem = { name: string; h: { y1: number; y2: number }; p: PointWall[]; w: Wall[] };
+export type TLevelItem = { name: string; h: { y1: number; y2: number }; p: PointWall[]; w: Wall[] };
 
 export class Level {
-  actId = 0;
-  levels: LevelItem[];
+  private actId: number;
+  levels: TLevelItem[];
 
   constructor() {
     this.actId = 0;
@@ -18,7 +18,7 @@ export class Level {
     console.log('class Level');
   }
 
-  protected initLevel() {
+  private initLevel() {
     let arr = [
       { name: 'level-1', h: { y1: 0, y2: 2.7 }, p: [], w: [] },
       { name: 'level-2', h: { y1: 2.7, y2: 5.4 }, p: [], w: [] },
@@ -84,5 +84,47 @@ export class Level {
     //this.levels[this.actId].w = this.levels[this.actId].w.filter((o) => o !== wall);
     let n = this.levels[this.actId].w.indexOf(wall);
     if (n > -1) this.levels[this.actId].w.splice(n, 1);
+  }
+
+  private delObjLevel({ id }: { id: number }) {
+    let point = this.levels[id].p;
+    this.levels[id].p = [];
+
+    for (let i = 0; i < point.length; i++) {
+      point[i].geometry.dispose();
+      scene.remove(point[i]);
+    }
+
+    let wall = this.levels[id].w;
+    this.levels[id].w = [];
+
+    for (let i = 0; i < wall.length; i++) {
+      wall[i].geometry.dispose();
+      scene.remove(wall[i]);
+    }
+  }
+
+  private delLevels() {
+    for (let i = 0; i < this.levels.length; i++) {
+      this.delObjLevel({ id: i });
+    }
+
+    setIdWallPoint(1);
+    setIdWall(1);
+
+    this.levels = [{ name: 'test', h: { y1: 0, y2: 2.7 }, p: [], w: [] }];
+    this.actId = 0;
+  }
+
+  upDataLevel({ data }: { data: TLevelItem[] }) {
+    this.delLevels();
+    this.levels = data;
+
+    this.initReactLevelList();
+    this.render();
+  }
+
+  private render() {
+    camOrbit.render();
   }
 }

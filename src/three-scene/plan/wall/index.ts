@@ -12,6 +12,10 @@ let matDefault = new THREE.MeshStandardMaterial({ color: 0xe3e3e5, wireframe: fa
 
 let idWall = 1;
 
+export function setIdWall(id: number) {
+  idWall = id;
+}
+
 interface UserInfo {
   id: number;
   readonly tag: string;
@@ -38,7 +42,7 @@ export class Wall extends THREE.Mesh {
   protected initWall({ id, p1, p2, h }: { id?: number; p1: PointWall; p2: PointWall; h?: number }) {
     if (!id) {
       id = idWall;
-      idWall++;
+      setIdWall(idWall + 1);
     }
     this.userInfo.id = id;
     this.userInfo.point = [p1, p2];
@@ -147,7 +151,6 @@ export class Wall extends THREE.Mesh {
     this.render();
 
     testInfoMemory();
-    console.log(level.levels[level.actId].w);
   }
 
   // удаляем стену и очищаем инфу в точках об этой стене
