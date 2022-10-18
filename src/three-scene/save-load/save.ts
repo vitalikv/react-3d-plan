@@ -68,6 +68,8 @@ function saveScene() {
       p[1] = { id: arr[i].w[i2].userInfo.point[1].userInfo.id, pos: arr[i].w[i2].userInfo.point[1].position };
 
       json.level[i].wall![i2].point = p;
+
+      json.level[i].wall![i2].width = arr[i].w[i2].userInfo.width;
     }
   }
 

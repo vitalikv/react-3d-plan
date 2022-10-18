@@ -47,7 +47,7 @@ function parseFile({ data }: { data: IFileJSON }) {
         point2 = new PointWall({ id: item.wall[i2].point[1].id, pos: pos2 });
       }
 
-      new Wall({ id: item.wall[i2].id, p1: point1, p2: point2 });
+      new Wall({ id: item.wall[i2].id, p1: point1, p2: point2, width: item.wall[i2].width });
     }
   }
 

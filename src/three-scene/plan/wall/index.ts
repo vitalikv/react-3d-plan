@@ -22,6 +22,7 @@ interface UserInfo {
   readonly wall: boolean;
   point: PointWall[];
   h: number;
+  width: number;
 }
 
 export class Wall extends THREE.Mesh {
@@ -31,15 +32,16 @@ export class Wall extends THREE.Mesh {
     wall: true,
     point: [],
     h: 0,
+    width: 0,
   };
 
-  constructor({ id, p1, p2 }: { id?: number; p1: PointWall; p2: PointWall }) {
+  constructor({ id, p1, p2, width }: { id?: number; p1: PointWall; p2: PointWall; width?: number }) {
     super(new THREE.BufferGeometry(), matDefault);
 
-    this.initWall({ id, p1, p2 });
+    this.initWall({ id, p1, p2, width });
   }
 
-  protected initWall({ id, p1, p2, h }: { id?: number; p1: PointWall; p2: PointWall; h?: number }) {
+  protected initWall({ id, p1, p2, width }: { id?: number; p1: PointWall; p2: PointWall; width?: number }) {
     if (!id) {
       id = idWall;
       setIdWall(idWall + 1);
@@ -51,10 +53,12 @@ export class Wall extends THREE.Mesh {
       point.addWall({ wall: this });
     });
 
-    if (!h) h = level.getHeight();
-    this.userInfo.h = h;
+    this.userInfo.h = level.getHeight();
 
-    this.updateGeomWall({ h });
+    if (!width) width = 0.02;
+    this.userInfo.width = width;
+
+    this.updateGeomWall();
 
     scene.add(this);
 
@@ -71,12 +75,14 @@ export class Wall extends THREE.Mesh {
     this.userInfo.point = this.userInfo.point.filter((o) => o !== point);
   }
 
-  updateGeomWall({ h }: { h?: number } = {}) {
+  updateGeomWall({ h, width }: { h?: number; width?: number } = {}) {
     let [p1, p2] = this.userInfo.point;
     if (!(p1 instanceof PointWall) || !(p2 instanceof PointWall)) return;
 
+    if (!width) width = this.userInfo.width;
+    else this.userInfo.width = width;
+
     let dir = new THREE.Vector2(p1.position.z - p2.position.z, p1.position.x - p2.position.x).normalize(); // перпендикуляр
-    let width = 0.02;
     let offsetL = new THREE.Vector2(dir.x * -width, dir.y * -width);
     let offsetR = new THREE.Vector2(dir.x * width, dir.y * width);
 
