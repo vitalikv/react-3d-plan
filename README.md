@@ -8,6 +8,8 @@ npm install @reduxjs/toolkit **установить - reduxjs/toolkit**
 npm i three **установить - three**
 npm i --save-dev @types/three **установить - @types чтобы VS понимал ts и three**
 
+npm i three-csg-ts **как установить https://www.npmjs.com/package/three-csg-ts**
+
 npm install sass --save-dev **установить - чтобы работал scss**
 
 ### package.json

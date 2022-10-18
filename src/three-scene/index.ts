@@ -11,6 +11,8 @@ import { Level } from 'three-scene/plan/level/index';
 
 import { apiThreeToUi } from 'api/three-ui';
 
+import { testCSG } from 'three-scene/csg/test';
+
 export let container: HTMLElement | null, canvas: HTMLCanvasElement, scene: THREE.Scene;
 export let mouseEv: Mouse, camOrbit: CAM.CameraOrbit;
 export let planeMath: THREE.Mesh;
@@ -82,6 +84,9 @@ export function init({ ready }: { ready: () => void }) {
   // let p1 = new PointWall({ pos: new THREE.Vector3(-2, 0, 1) });
   // let p2 = new PointWall({ pos: new THREE.Vector3(4, 0, 1) });
   // new Wall({ p1, p2 });
+
+  //testCSG
+  testCSG();
 
   //deleteObj
   initDeleteObj();
