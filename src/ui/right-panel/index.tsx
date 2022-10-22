@@ -1,4 +1,5 @@
 import ListFloor from 'ui/right-panel/floor/list';
+import Tabs from 'ui/right-panel/tabs/index';
 
 const styles: any = {
   panelR: {
@@ -18,6 +19,7 @@ export default function PanelR() {
 
   return (
     <div nameid="panelR" style={styles.panelR}>
+      <Tabs />
       {show && <ListFloor />}
     </div>
   );

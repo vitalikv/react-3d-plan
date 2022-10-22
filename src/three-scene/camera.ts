@@ -55,8 +55,7 @@ export class CameraOrbit {
     //this.params.canvas.addEventListener('touchmove', mouseMove, false);
     //this.params.canvas.addEventListener('touchend', mouseUp, false);
 
-    this.params.canvas.addEventListener('DOMMouseScroll', mouseWheel, false);
-    this.params.canvas.addEventListener('mousewheel', mouseWheel, false);
+    this.params.canvas.addEventListener('wheel', mouseWheel, false);
 
     window.addEventListener('resize', windowResize, false);
   }
@@ -330,12 +329,12 @@ export class CameraOrbit {
     return intersects;
   }
 
-  mouseWheel(event: any) {
+  mouseWheel(event: Event) {
     //let delta = event.wheelDelta ? event.wheelDelta / 120 : event.detail ? event.detail / 3 : 0;
-    let delta = event.detail ? event.detail / 3 : 0;
-    if (this.typeBrowser === 'Chrome' || this.typeBrowser === 'Opera') {
-      delta = -delta;
-    }
+
+    if (!(event instanceof WheelEvent)) return;
+
+    let delta = event.deltaY / 30;
 
     if (this.activeCam === this.cam2D) {
       this.cameraZoom2D({ camera2D: this.cam2D, delta: delta });

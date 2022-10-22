@@ -37,14 +37,13 @@ export class UIinpit {
 
   initEvent() {
     //this.input?.addEventListener('change', this.onChange);
-    if (this.input)
-      this.input.onchange = (event: Event) => {
-        this.onChange(event);
-      };
+    if (this.input) this.input.onchange = this.onChange;
   }
 
-  onChange(event: any) {
+  onChange(event: Event) {
     let obj = mouseEv.obj;
+
+    if (!(event.target instanceof HTMLInputElement)) return;
 
     console.log(event.target.value);
     if (obj instanceof Wall) {
