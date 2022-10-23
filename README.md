@@ -20,7 +20,7 @@ npm install sass --save-dev **установить - чтобы работал s
 
 {
 "compilerOptions": {
-"baseUrl": "src"
+"baseUrl": "src" **прописать в tsconfig.json, чтобы при import можно было ставить абсолютный путь от src**
 },
 "include": ["src"]
 }

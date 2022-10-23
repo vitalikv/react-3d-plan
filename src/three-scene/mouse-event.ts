@@ -1,9 +1,10 @@
 import * as THREE from 'three';
-import { canvas } from './index';
+import { canvas, camOrbit } from './index';
 import { rayIntersect } from 'three-scene/core/rayhit';
 import { PointWall } from 'three-scene/plan/point/point';
 import { Wall } from 'three-scene/plan/wall/index';
 import { level } from 'three-scene/index';
+import { outlinePass } from 'three-scene/core/composer-render';
 
 export class Mouse {
   canvas;
@@ -45,14 +46,37 @@ export class Mouse {
 
     if (button === 'right') return;
 
-    let intersects = rayIntersect(event, level.getArrObjs(), 'arr');
-    if (intersects.length === 0) return;
+    this.obj = null;
+    outlinePass.selectedObjects = [];
+    this.render();
 
-    let obj = intersects[0].object;
+    let ray = this.orderObjs(event);
+    console.log(ray);
+    if (ray) {
+      if (ray.object instanceof PointWall) ray.object.click({ pos: ray.point });
+      if (ray.object instanceof Wall) ray.object.click({ pos: ray.point });
 
-    if (obj instanceof PointWall) obj.click({ pos: intersects[0].point });
-    if (obj instanceof Wall) obj.click({ pos: intersects[0].point });
+      this.obj = ray.object;
+    }
+  }
 
-    this.obj = obj;
+  protected orderObjs(event: MouseEvent) {
+    let list = [level.getArrPointWall(), level.getArrWall()];
+
+    let ray = null;
+
+    for (let i = 0; i < list.length; i++) {
+      let intersects = rayIntersect(event, list[i], 'arr');
+      if (intersects.length === 0) continue;
+
+      ray = intersects[0];
+      break;
+    }
+
+    return ray;
+  }
+
+  render() {
+    camOrbit.render();
   }
 }
