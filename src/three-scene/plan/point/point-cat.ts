@@ -1,4 +1,4 @@
-import { canvas, camOrbit, planeMath, mouseEv } from 'three-scene/index';
+import { canvas, camOrbit, planeMath, mouseEv, lineAxis } from 'three-scene/index';
 import { rayIntersect } from 'three-scene/core/rayhit';
 import { nearPoint, finishSelectPoint } from 'three-scene/plan/point/index';
 import { PointWall } from './point';
@@ -28,22 +28,14 @@ export function addPointFromCat({ event, obj1 }: { event: MouseEvent; obj1?: Poi
     let intersects = rayIntersect(event, planeMath, 'one');
     if (intersects.length === 0) return;
 
-    obj.position.copy(intersects[0].point);
-
-    let newPos = nearPoint({ point: obj });
-    if (newPos) obj.position.copy(newPos);
-
-    obj.userInfo.wall.forEach((o) => {
-      if (o instanceof Wall) o.updateGeomWall();
-    });
-
-    camOrbit.render();
+    obj.movePoint({ point: obj, pos: intersects[0].point });
   };
 
   canvas.onmousedown = (event) => {
     canvas.onmousemove = null;
     canvas.onmousedown = null;
 
+    lineAxis.visible(false);
     camOrbit.stopMove = false;
     mouseEv.stop = false;
 

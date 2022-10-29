@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { canvas, scene, camOrbit, mouseEv, planeMath } from 'three-scene/index';
+import { canvas, scene, camOrbit, mouseEv, planeMath, lineAxis } from 'three-scene/index';
 import { rayIntersect } from 'three-scene/core/rayhit';
 import { nearPoint, finishSelectPoint } from 'three-scene/plan/point/index';
 import { Wall } from 'three-scene/plan/wall/index';
@@ -118,22 +118,15 @@ export class PointWall extends THREE.Mesh {
       if (intersects.length === 0) return;
 
       let pos = new THREE.Vector3().addVectors(intersects[0].point, offset);
-      this.position.copy(pos);
 
-      let newPos = nearPoint({ point: this });
-      if (newPos) this.position.copy(newPos);
-
-      this.userInfo.wall.forEach((wall) => {
-        if (wall instanceof Wall) wall.updateGeomWall();
-      });
-
-      this.render();
+      this.movePoint({ point: this, pos });
     };
 
     canvas.onmouseup = () => {
       canvas.onmousemove = null;
       canvas.onmouseup = null;
 
+      lineAxis.visible(false);
       finishSelectPoint({ obj: this });
 
       camOrbit.stopMove = false;
@@ -141,6 +134,24 @@ export class PointWall extends THREE.Mesh {
 
       this.render();
     };
+  }
+
+  movePoint({ point, pos }: { point: PointWall; pos: THREE.Vector3 }) {
+    lineAxis.visible(false);
+
+    point.position.copy(pos);
+
+    let newPos = nearPoint({ point });
+
+    if (!newPos) newPos = lineAxis.setLine({ point });
+
+    if (newPos) point.position.copy(newPos);
+
+    point.userInfo.wall.forEach((o) => {
+      if (o instanceof Wall) o.updateGeomWall();
+    });
+
+    this.render();
   }
 
   delete() {

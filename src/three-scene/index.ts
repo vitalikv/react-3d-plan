@@ -8,6 +8,7 @@ import { PointWall } from 'three-scene/plan/point/point';
 import { initComposerRender } from 'three-scene/core/composer-render';
 import { initDeleteObj } from 'three-scene/delete';
 import { Level } from 'three-scene/plan/level/index';
+import { LineAxis } from 'three-scene/plan/point/line-axis';
 
 import { apiThreeToUi } from 'api/three-ui';
 
@@ -19,6 +20,7 @@ export let mouseEv: Mouse, camOrbit: CAM.CameraOrbit;
 export let planeMath: THREE.Mesh;
 export let renderer: THREE.WebGLRenderer;
 export let level: Level;
+export let lineAxis: LineAxis;
 let ambientLight, light;
 
 export function init({ ready }: { ready: () => void }) {
@@ -80,6 +82,9 @@ export function init({ ready }: { ready: () => void }) {
 
   // level
   level = new Level();
+
+  // LineAxis
+  lineAxis = new LineAxis();
 
   //wall
   // let p1 = new PointWall({ pos: new THREE.Vector3(-2, 0, 1) });
