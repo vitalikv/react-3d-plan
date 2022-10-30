@@ -4,6 +4,7 @@ import * as Wpoint from './plan/point/btn-promise';
 import { Mouse } from './mouse-event';
 import { Wall } from './plan/wall/index';
 import { crPlaneMath } from 'three-scene/core/index';
+import { clipping } from 'three-scene/core/clipping';
 import { PointWall } from 'three-scene/plan/point/point';
 import { initComposerRender } from 'three-scene/core/composer-render';
 import { initDeleteObj } from 'three-scene/delete';
@@ -42,6 +43,9 @@ export function init({ ready }: { ready: () => void }) {
   container.appendChild(renderer.domElement);
 
   canvas = renderer.domElement;
+
+  //Clipping
+  clipping.init({ renderer });
 
   // CAMERA
   camOrbit = new CAM.CameraOrbit({

@@ -5,6 +5,7 @@ import { PointWall } from 'three-scene/plan/point/point';
 import { testInfoMemory } from 'three-scene/core/index';
 import { outlinePass } from 'three-scene/core/composer-render';
 import { level } from 'three-scene/index';
+import { clipping } from 'three-scene/core/clipping';
 
 //export let walls: Wall[] = [];
 
@@ -59,6 +60,8 @@ export class Wall extends THREE.Mesh {
     this.userInfo.width = width;
 
     this.updateGeomWall();
+
+    clipping.setObjClipping({ obj: this });
 
     scene.add(this);
 
