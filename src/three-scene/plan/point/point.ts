@@ -10,9 +10,10 @@ import { level } from 'three-scene/index';
 
 let matDefault = new THREE.MeshStandardMaterial({
   color: 0x222222,
-  depthTest: false,
-  transparent: true,
+  //depthTest: false,
+  //transparent: true,
   wireframe: false,
+  depthFunc: THREE.NotEqualDepth,
 });
 
 let matActive = new THREE.MeshStandardMaterial({
