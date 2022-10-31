@@ -13,13 +13,14 @@ export class LineAxis {
   }
 
   protected init() {
-    let geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-1000, 0, 0), new THREE.Vector3(1000, 0, 0)]);
-    let material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    let material = new THREE.LineBasicMaterial({ color: 0xff0000, depthTest: false, transparent: true });
 
     this.lX = new THREE.Line(new THREE.BufferGeometry(), material);
+    this.lX.renderOrder = 1;
     scene.add(this.lX);
 
     this.lY = new THREE.Line(new THREE.BufferGeometry(), material);
+    this.lY.renderOrder = 1;
     scene.add(this.lY);
   }
 
@@ -54,8 +55,8 @@ export class LineAxis {
     newPos = pos.clone();
 
     if (posAxis.horiz) {
-      let p1 = new THREE.Vector3(-1000, 0, posAxis.horiz.z);
-      let p2 = new THREE.Vector3(1000, 0, posAxis.horiz.z);
+      let p1 = new THREE.Vector3(-1000, pos.y, posAxis.horiz.z);
+      let p2 = new THREE.Vector3(1000, pos.y, posAxis.horiz.z);
 
       let geometry = new THREE.BufferGeometry().setFromPoints([p1, p2]);
 
@@ -67,8 +68,8 @@ export class LineAxis {
     }
 
     if (posAxis.vert) {
-      let p1 = new THREE.Vector3(posAxis.vert.x, 0, -1000);
-      let p2 = new THREE.Vector3(posAxis.vert.x, 0, 1000);
+      let p1 = new THREE.Vector3(posAxis.vert.x, pos.y, -1000);
+      let p2 = new THREE.Vector3(posAxis.vert.x, pos.y, 1000);
 
       let geometry = new THREE.BufferGeometry().setFromPoints([p1, p2]);
 

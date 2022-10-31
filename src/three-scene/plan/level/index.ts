@@ -1,4 +1,5 @@
-import { scene, camOrbit } from 'three-scene/index';
+import * as THREE from 'three';
+import { scene, camOrbit, mouseEv } from 'three-scene/index';
 import { store } from 'ui/store/store';
 import { init } from 'ui/store/slice/slice-level-list';
 import { Wall, setIdWall } from 'three-scene/plan/wall/index';
@@ -9,10 +10,12 @@ export type TLevelItem = { name: string; h: { y1: number; y2: number }; p: Point
 export class Level {
   private actId: number;
   levels: TLevelItem[];
+  grid: THREE.GridHelper;
 
-  constructor() {
+  constructor({ grid }: { grid: THREE.GridHelper }) {
     this.actId = 0;
     this.levels = [];
+    this.grid = grid;
 
     this.initLevel();
     console.log('class Level');
@@ -43,6 +46,10 @@ export class Level {
 
   changeLevelAct({ id }: { id: number }) {
     this.actId = id;
+
+    mouseEv.resetSelect();
+    this.grid.position.y = this.getPosY1() + 0.002;
+    this.render();
     console.log('this.actId', this.actId);
   }
 

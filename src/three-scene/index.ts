@@ -45,7 +45,7 @@ export function init({ ready }: { ready: () => void }) {
   canvas = renderer.domElement;
 
   //Clipping
-  clipping.init({ renderer });
+  //clipping.init({ renderer });
 
   // CAMERA
   camOrbit = new CAM.CameraOrbit({
@@ -67,13 +67,7 @@ export function init({ ready }: { ready: () => void }) {
   scene.add(light);
 
   //Grid
-  const helper: THREE.GridHelper = new THREE.GridHelper(200, 200);
-  helper.position.y = 0;
-  if (!Array.isArray(helper.material)) {
-    helper.material.opacity = 0.75;
-    helper.material.transparent = true;
-  }
-  scene.add(helper);
+  let grid = initGrid();
 
   //mouse
   mouseEv = new Mouse({ canvas });
@@ -85,7 +79,7 @@ export function init({ ready }: { ready: () => void }) {
   planeMath = crPlaneMath();
 
   // level
-  level = new Level();
+  level = new Level({ grid });
 
   // LineAxis
   lineAxis = new LineAxis();
@@ -108,4 +102,57 @@ export function init({ ready }: { ready: () => void }) {
   if (ready) ready();
 
   apiThreeToUi.readyThree();
+}
+
+function initGrid() {
+  let grid = crGrid();
+  crPlane(grid);
+
+  function crGrid() {
+    const grid: THREE.GridHelper = new THREE.GridHelper(30, 30);
+    grid.position.y = 0;
+    if (!Array.isArray(grid.material)) {
+      grid.material.opacity = 1;
+      grid.material.transparent = true;
+    }
+
+    scene.add(grid);
+
+    return grid;
+  }
+
+  function crPlane(grid: THREE.GridHelper) {
+    let geometry = new THREE.PlaneGeometry(30, 30);
+    let material = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.8,
+      side: THREE.DoubleSide,
+      lightMap: crTexture(),
+    });
+
+    let obj = new THREE.Mesh(geometry, material);
+    obj.position.y = -0.001;
+    obj.rotation.set(-Math.PI / 2, 0, 0);
+
+    grid.add(obj);
+  }
+
+  function crTexture() {
+    let canvas = document.createElement('canvas');
+    let context = canvas.getContext('2d');
+
+    canvas.width = 64;
+    canvas.height = 64;
+
+    context!.fillStyle = 'rgba(255,255,255,1)';
+    context!.fillRect(0, 0, canvas.width, canvas.height);
+
+    let texture = new THREE.Texture(canvas);
+    texture.needsUpdate = true;
+
+    return texture;
+  }
+
+  return grid;
 }

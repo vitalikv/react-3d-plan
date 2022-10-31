@@ -63,7 +63,7 @@ export class CameraOrbit {
   initCam2D() {
     let aspect = this.params.canvas.clientWidth / this.params.canvas.clientHeight;
     let d = 5;
-    let camera2D = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 1, 1000);
+    let camera2D = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 0.0001, 1000);
     camera2D.position.set(0, 10, 0);
     camera2D.lookAt(this.params.scene.position);
     camera2D.zoom = 1;
@@ -74,7 +74,7 @@ export class CameraOrbit {
   }
 
   initCam3D() {
-    let camera3D = new THREE.PerspectiveCamera(65, this.params.canvas.clientWidth / this.params.canvas.clientHeight, 0.01, 1000);
+    let camera3D = new THREE.PerspectiveCamera(65, this.params.canvas.clientWidth / this.params.canvas.clientHeight, 0.0001, 1000);
     camera3D.rotation.order = 'YZX'; //'ZYX'
     camera3D.position.set(5, 7, 5);
     camera3D.lookAt(new THREE.Vector3());
@@ -87,7 +87,7 @@ export class CameraOrbit {
     camera3D.userData.camera.click.pos = new THREE.Vector3();
 
     function targetO(scene: THREE.Scene) {
-      let material = new THREE.MeshPhongMaterial({
+      let material = new THREE.MeshStandardMaterial({
         color: 0x0000ff,
         transparent: true,
         opacity: 1,
@@ -106,7 +106,7 @@ export class CameraOrbit {
 
   initPlaneMath() {
     let geometry = new THREE.PlaneGeometry(10000, 10000);
-    let material = new THREE.MeshPhongMaterial({
+    let material = new THREE.MeshStandardMaterial({
       color: 0xffff00,
       transparent: true,
       opacity: 0.5,

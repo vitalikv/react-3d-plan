@@ -46,12 +46,13 @@ export class Mouse {
 
     if (button === 'right') return;
 
-    this.obj = null;
-    outlinePass.selectedObjects = [];
+    this.resetSelect();
     this.render();
 
+    if (camOrbit.activeCam === camOrbit.cam3D) return;
+
     let ray = this.orderObjs(event);
-    console.log(ray);
+
     if (ray) {
       if (ray.object instanceof PointWall) ray.object.click({ pos: ray.point });
       if (ray.object instanceof Wall) ray.object.click({ pos: ray.point });
@@ -74,6 +75,11 @@ export class Mouse {
     }
 
     return ray;
+  }
+
+  resetSelect() {
+    this.obj = null;
+    outlinePass.selectedObjects = [];
   }
 
   render() {

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { toggle } from 'ui/store/slice/btnCamSlice';
-import * as Tscene from 'three-scene/index';
+import { level, camOrbit, mouseEv } from 'three-scene/index';
 
 const styles: any = {
   wrapBtnCam: {
@@ -38,7 +38,15 @@ export default function BtnCamera() {
   console.log(stateCam);
 
   stateCam.forEach((item: any) => {
-    if (item.display === '') Tscene.camOrbit.setActiveCam(item.type);
+    if (item.display === '') {
+      mouseEv.resetSelect();
+
+      level.getArrPointWall().forEach((point) => {
+        item.type === '2D' ? (point.visible = true) : (point.visible = false);
+      });
+
+      camOrbit.setActiveCam(item.type);
+    }
   });
 
   const clickBtn = ({ type, name }: { type: string; name?: null | string }) => {
