@@ -1,7 +1,5 @@
 import * as THREE from 'three';
-import { scene, camOrbit, mouseEv } from 'three-scene/index';
-import { store } from 'ui/store/store';
-import { init } from 'ui/store/slice/slice-level-list';
+import { scene, camOrbit, mouseEv, uimain } from 'three-scene/index';
 import { Wall, setIdWall } from 'three-scene/plan/wall/index';
 import { PointWall, setIdWallPoint } from 'three-scene/plan/point/point';
 
@@ -40,8 +38,7 @@ export class Level {
 
     arr[this.actId].act = true;
 
-    //const dispatch = useAppDispatch();
-    store.dispatch(init(arr));
+    uimain.rp?.level?.crList({ arr });
   }
 
   changeLevelAct({ id }: { id: number }) {

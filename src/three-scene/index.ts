@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import * as CAM from './camera';
-import * as Wpoint from './plan/point/btn-promise';
 import { Mouse } from './mouse-event';
 import { Wall } from './plan/wall/index';
 import { crPlaneMath } from 'three-scene/core/index';
@@ -74,9 +73,6 @@ export function init({ ready }: { ready: () => void }) {
   //mouse
   mouseEv = new Mouse({ canvas });
 
-  //UI
-  Wpoint.crBtnPointWall({ container, canvas: renderer.domElement });
-
   //planeMath
   planeMath = crPlaneMath();
 
@@ -90,7 +86,6 @@ export function init({ ready }: { ready: () => void }) {
   // let p1 = new PointWall({ pos: new THREE.Vector3(-2, 0, 1) });
   // let p2 = new PointWall({ pos: new THREE.Vector3(4, 0, 1) });
   // new Wall({ p1, p2 });
-  uimain = new UImain();
 
   //testCSG
   //testCSG();
@@ -104,4 +99,6 @@ export function init({ ready }: { ready: () => void }) {
   if (ready) ready();
 
   apiThreeToUi.readyThree();
+
+  uimain = new UImain();
 }
