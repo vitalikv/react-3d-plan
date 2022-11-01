@@ -15,7 +15,7 @@ import { initGrid } from 'three-scene/plan/level/grid';
 import { apiThreeToUi } from 'api/three-ui';
 
 import { testCSG } from 'three-scene/csg/test';
-import { UIinpit } from './plan/wall/ui';
+import { UImain } from 'ui/main';
 
 export let container: HTMLElement | null, canvas: HTMLCanvasElement, scene: THREE.Scene;
 export let mouseEv: Mouse, camOrbit: CAM.CameraOrbit;
@@ -23,6 +23,7 @@ export let planeMath: THREE.Mesh;
 export let renderer: THREE.WebGLRenderer;
 export let level: Level;
 export let lineAxis: LineAxis;
+export let uimain: UImain;
 let ambientLight, light;
 
 export function init({ ready }: { ready: () => void }) {
@@ -89,7 +90,7 @@ export function init({ ready }: { ready: () => void }) {
   // let p1 = new PointWall({ pos: new THREE.Vector3(-2, 0, 1) });
   // let p2 = new PointWall({ pos: new THREE.Vector3(4, 0, 1) });
   // new Wall({ p1, p2 });
-  new UIinpit();
+  uimain = new UImain();
 
   //testCSG
   //testCSG();

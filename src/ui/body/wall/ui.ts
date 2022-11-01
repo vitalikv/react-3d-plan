@@ -37,18 +37,21 @@ export class UIinpit {
 
   initEvent() {
     //this.input?.addEventListener('change', this.onChange);
-    if (this.input) this.input.onchange = this.onChange;
+    this.input!.onchange = this.onChange;
   }
 
   onChange(event: Event) {
-    let obj = mouseEv.obj;
-
     if (!(event.target instanceof HTMLInputElement)) return;
 
-    console.log(event.target.value);
+    let obj = mouseEv.obj;
+
     if (obj instanceof Wall) {
       obj.updateGeomWall({ width: Number(event.target.value) });
       camOrbit.render();
     }
+  }
+
+  setInputValue(value: number) {
+    this.input!.value = '' + value;
   }
 }

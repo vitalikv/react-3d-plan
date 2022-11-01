@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { canvas, scene, camOrbit, mouseEv, planeMath } from 'three-scene/index';
+import { canvas, scene, camOrbit, mouseEv, planeMath, uimain } from 'three-scene/index';
 import { rayIntersect } from 'three-scene/core/rayhit';
 import { PointWall } from 'three-scene/plan/point/point';
 import { testInfoMemory } from 'three-scene/core/index';
@@ -111,6 +111,8 @@ export class Wall extends THREE.Mesh {
   click({ pos }: { pos: THREE.Vector3 }) {
     start();
     console.log(this.userInfo);
+
+    uimain.canvas.wall.input?.setInputValue(this.userInfo.width);
 
     outlinePass.selectedObjects = [this];
     this.render();

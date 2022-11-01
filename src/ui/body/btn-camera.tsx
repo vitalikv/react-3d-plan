@@ -40,11 +40,7 @@ export default function BtnCamera() {
   stateCam.forEach((item: any) => {
     if (item.display === '') {
       mouseEv.resetSelect();
-
-      level.getArrPointWall().forEach((point) => {
-        item.type === '2D' ? (point.visible = true) : (point.visible = false);
-      });
-
+      level.switchCamera({ type: item.type });
       camOrbit.setActiveCam(item.type);
     }
   });

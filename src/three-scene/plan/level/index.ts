@@ -49,6 +49,10 @@ export class Level {
 
     mouseEv.resetSelect();
     this.grid.position.y = this.getPosY1() + 0.002;
+
+    if (camOrbit.activeCam === camOrbit.cam2D) showLevelCam2D({ actId: this.actId, level: this });
+    if (camOrbit.activeCam === camOrbit.cam3D) showLevelCam3D({ actId: this.actId, level: this });
+
     this.render();
     console.log('this.actId', this.actId);
   }
@@ -131,7 +135,31 @@ export class Level {
     this.render();
   }
 
+  switchCamera({ type }: { type: string }) {
+    if (type === '2D') showLevelCam2D({ actId: this.actId, level: this });
+    if (type === '3D') showLevelCam3D({ actId: this.actId, level: this });
+  }
+
   private render() {
     camOrbit.render();
+  }
+}
+
+function showLevelCam2D({ actId, level }: { actId: number; level: Level }) {
+  for (let i = 0; i < level.levels.length; i++) {
+    let visible = false;
+
+    if (i === actId) visible = true;
+    if (i === actId - 1) visible = true;
+
+    level.levels[i].p.forEach((p) => (p.visible = visible));
+    level.levels[i].w.forEach((w) => (w.visible = visible));
+  }
+}
+
+function showLevelCam3D({ actId, level }: { actId: number; level: Level }) {
+  for (let i = 0; i < level.levels.length; i++) {
+    level.levels[i].p.forEach((p) => (p.visible = false));
+    level.levels[i].w.forEach((w) => (w.visible = true));
   }
 }
