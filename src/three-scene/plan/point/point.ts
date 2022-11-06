@@ -5,6 +5,7 @@ import { nearPoint, finishSelectPoint } from 'three-scene/plan/point/index';
 import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
 import { level } from 'three-scene/index';
+import { cornersWall } from 'three-scene/plan/wall/corners-wall';
 
 //export let points: PointWall[] = [];
 
@@ -99,6 +100,8 @@ export class PointWall extends THREE.Mesh {
   click({ pos }: { pos: THREE.Vector3 }) {
     start();
     console.log(this.userInfo);
+
+    cornersWall.move({ point: this });
 
     outlinePass.selectedObjects = [this];
     this.render();

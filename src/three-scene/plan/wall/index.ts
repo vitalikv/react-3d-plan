@@ -24,6 +24,7 @@ interface UserInfo {
   point: PointWall[];
   h: number;
   width: number;
+  geom: { v: THREE.Vector2[] };
 }
 
 export class Wall extends THREE.Mesh {
@@ -34,6 +35,7 @@ export class Wall extends THREE.Mesh {
     point: [],
     h: 0,
     width: 0,
+    geom: { v: [] },
   };
 
   constructor({ id, p1, p2, width }: { id?: number; p1: PointWall; p2: PointWall; width?: number }) {
@@ -56,7 +58,7 @@ export class Wall extends THREE.Mesh {
 
     this.userInfo.h = level.getHeight();
 
-    if (!width) width = 0.02;
+    if (!width) width = 0.1;
     this.userInfo.width = width;
 
     this.updateGeomWall();
@@ -106,6 +108,8 @@ export class Wall extends THREE.Mesh {
 
     this.geometry.dispose();
     this.geometry = geometry;
+
+    this.userInfo.geom.v = arr;
   }
 
   click({ pos }: { pos: THREE.Vector3 }) {
