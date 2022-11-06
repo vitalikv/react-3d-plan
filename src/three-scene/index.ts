@@ -101,4 +101,5 @@ export function init({ ready }: { ready: () => void }) {
   apiThreeToUi.readyThree();
 
   uimain = new UImain();
+  level.initReactLevelList();
 }

@@ -4,9 +4,6 @@ import './style/index.scss';
 
 import * as Thrscene from './three-scene/index';
 
-export function initReact(): void {
-  const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-  root.render(<div></div>);
-}
+export function initReact(): void {}
 
 Thrscene.init({ ready: initReact });

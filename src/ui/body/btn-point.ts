@@ -20,8 +20,9 @@ export class UIbtnPoint {
   }
 
   html() {
-    let html = `<div nameId="point" class="button1 gradient_1" style="position: absolute; left: 20px; top: 20px;">
-          point 2
+    let html = `
+        <div nameId="point" class="button1 gradient_1" style="position: absolute; left: 20px; top: 20px;">
+          point 
         </div>`;
 
     return html;

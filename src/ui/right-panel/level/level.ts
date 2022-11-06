@@ -37,6 +37,8 @@ export class UIlevelList {
 
       this.items.push({ ...arr[i], el: elem });
     }
+
+    if (this.items.length > 0) this.items[0].el.style.background = 'rgb(167, 207, 242)';
   }
 
   crItem({ item }: { item: { act: boolean; name: string } }) {
