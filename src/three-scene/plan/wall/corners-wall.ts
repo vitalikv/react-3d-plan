@@ -7,6 +7,36 @@ let cube: THREE.Mesh | null = null;
 
 class CornersWall {
   move({ point }: { point: PointWall }) {
+    let arrP = [point];
+    let walls = point.userInfo.wall;
+
+    for (let i = 0; i < walls.length; i++) {
+      let p = walls[i].userInfo.point[0] === point ? walls[i].userInfo.point[1] : walls[i].userInfo.point[0];
+      arrP.push(p);
+    }
+
+    let walls2 = [];
+    for (let i = 0; i < arrP.length; i++) {
+      let arrW = arrP[i].userInfo.wall;
+
+      for (let i2 = 0; i2 < arrW.length; i2++) {
+        let exsist = walls.find((w) => w === arrW[i2]);
+
+        if (!exsist) {
+          walls2.push(arrW[i2]);
+          arrW[i2].updateGeomWall();
+        }
+      }
+    }
+
+    console.log(walls2);
+
+    for (let i = 0; i < arrP.length; i++) this.upLineYY(arrP[i]);
+
+    camOrbit.render();
+  }
+
+  upLineYY(point: PointWall) {
     if (point.userInfo.wall.length < 2) return;
 
     let arr = [];
@@ -41,6 +71,8 @@ class CornersWall {
       };
     }
 
+    if (arr.length < 2) return;
+
     let cross = intersect(arr[0].line1, arr[1].line2); // направление линии вперед (сторона А)
     if (cross) {
       crossWall(cross, arr[0].wall, arr[0].sideA);
@@ -65,8 +97,6 @@ class CornersWall {
       crossWall(cross, arr[0].wall, arr[0].sideB);
       crossWall(cross, arr[1].wall, arr[1].sideA);
     }
-
-    camOrbit.render();
   }
 }
 

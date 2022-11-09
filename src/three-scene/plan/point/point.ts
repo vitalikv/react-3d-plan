@@ -124,8 +124,6 @@ export class PointWall extends THREE.Mesh {
       let pos = new THREE.Vector3().addVectors(intersects[0].point, offset);
 
       this.movePoint({ point: this, pos });
-
-      cornersWall.move({ point: this });
     };
 
     canvas.onmouseup = () => {
@@ -156,6 +154,8 @@ export class PointWall extends THREE.Mesh {
     point.userInfo.wall.forEach((o) => {
       if (o instanceof Wall) o.updateGeomWall();
     });
+
+    cornersWall.move({ point: this });
 
     this.render();
   }
