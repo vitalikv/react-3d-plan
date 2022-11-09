@@ -124,6 +124,8 @@ export class PointWall extends THREE.Mesh {
       let pos = new THREE.Vector3().addVectors(intersects[0].point, offset);
 
       this.movePoint({ point: this, pos });
+
+      cornersWall.move({ point: this });
     };
 
     canvas.onmouseup = () => {
