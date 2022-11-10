@@ -151,11 +151,14 @@ export class PointWall extends THREE.Mesh {
 
     if (newPos) point.position.copy(newPos);
 
-    point.userInfo.wall.forEach((o) => {
-      if (o instanceof Wall) o.updateGeomWall();
-    });
-
-    cornersWall.move({ point: this });
+    let angle = true;
+    if (angle) {
+      cornersWall.move({ point: this });
+    } else {
+      point.userInfo.wall.forEach((o) => {
+        if (o instanceof Wall) o.updateGeomWall();
+      });
+    }
 
     this.render();
   }

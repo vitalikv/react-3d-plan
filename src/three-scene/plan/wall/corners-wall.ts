@@ -3,45 +3,65 @@ import { scene, camOrbit } from 'three-scene/index';
 import { Wall } from 'three-scene/plan/wall/index';
 import { PointWall } from 'three-scene/plan/point/point';
 
-let cube: THREE.Mesh | null = null;
-
 class CornersWall {
   move({ point }: { point: PointWall }) {
-    let arrP = [point];
+    let arrP = [point]; // массив точек (выбранная и соседние)
     let walls = point.userInfo.wall;
 
     for (let i = 0; i < walls.length; i++) {
       let p = walls[i].userInfo.point[0] === point ? walls[i].userInfo.point[1] : walls[i].userInfo.point[0];
-      arrP.push(p);
+      arrP.push(p); // добавляем в массив соседние точки
     }
 
-    let walls2 = [];
+    let walls2 = [...walls]; // массив стены у которых будут меняться углы
+
     for (let i = 0; i < arrP.length; i++) {
       let arrW = arrP[i].userInfo.wall;
 
       for (let i2 = 0; i2 < arrW.length; i2++) {
-        let exsist = walls.find((w) => w === arrW[i2]);
+        let exsist = walls2.find((w) => w === arrW[i2]);
 
-        if (!exsist) {
-          walls2.push(arrW[i2]);
-          arrW[i2].updateGeomWall();
-        }
+        if (!exsist) walls2.push(arrW[i2]); // добавляем в массив соседние стены
       }
     }
 
-    console.log(walls2);
+    for (let i = 0; i < walls2.length; i++) this.defaultV(walls2[i]); // сбрасываем точки (userInfo.geom.v) стен до прямой стены (без углов)
 
-    for (let i = 0; i < arrP.length; i++) this.upLineYY(arrP[i]);
+    for (let i = 0; i < arrP.length; i++) this.calcAngle(arrP[i]); // точки у стен получают углы
+
+    for (let i = 0; i < walls2.length; i++) this.updateGeomWall({ wall: walls2[i] }); // создаем стены с новыми точками
 
     camOrbit.render();
   }
 
-  upLineYY(point: PointWall) {
+  // сбрасываем точки (userInfo.geom.v) стен до прямой стены (без углов)
+  defaultV(wall: Wall) {
+    let [p1, p2] = wall.userInfo.point;
+    let width = wall.userInfo.width;
+
+    let dir = new THREE.Vector2(p1.position.z - p2.position.z, p1.position.x - p2.position.x).normalize(); // перпендикуляр
+    let offsetL = new THREE.Vector2(dir.x * -width, dir.y * -width);
+    let offsetR = new THREE.Vector2(dir.x * width, dir.y * width);
+
+    let arr = [];
+
+    arr[arr.length] = new THREE.Vector2(p1.position.x, -p1.position.z).add(offsetR);
+    arr[arr.length] = new THREE.Vector2(p1.position.x, -p1.position.z + 0);
+    arr[arr.length] = new THREE.Vector2(p1.position.x, -p1.position.z).add(offsetL);
+    arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z).add(offsetL);
+    arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z + 0);
+    arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z).add(offsetR);
+
+    wall.userInfo.geom.v = arr;
+  }
+
+  // если стены перескаются и образуют угол, то обновляем точки стены (userInfo.geom.v)
+  calcAngle(point: PointWall) {
     if (point.userInfo.wall.length < 2) return;
 
     let arr = [];
     let walls = point.userInfo.wall;
-
+    //console.log(walls[0].userInfo.geom.v);
     for (let i = 0; i < walls.length; i++) {
       let order = 0; // начало стены
       if (walls[i].userInfo.point[1] === point) order = 3; // конец стены
@@ -71,91 +91,46 @@ class CornersWall {
       };
     }
 
-    if (arr.length < 2) return;
-
     let cross = intersect(arr[0].line1, arr[1].line2); // направление линии вперед (сторона А)
     if (cross) {
-      crossWall(cross, arr[0].wall, arr[0].sideA);
-      crossWall(cross, arr[1].wall, arr[1].sideB);
+      arr[0].wall.userInfo.geom.v[arr[0].sideA] = new THREE.Vector2(cross.x, -cross.y);
+      arr[1].wall.userInfo.geom.v[arr[1].sideB] = new THREE.Vector2(cross.x, -cross.y);
+
+      //---- внутренние углы
+      cross = intersect(arr[0].line4, arr[1].line3); // направление линии назад (сторона Б)
+      if (cross) {
+        arr[0].wall.userInfo.geom.v[arr[0].sideB] = new THREE.Vector2(cross.x, -cross.y);
+        arr[1].wall.userInfo.geom.v[arr[1].sideA] = new THREE.Vector2(cross.x, -cross.y);
+      }
     }
 
     cross = intersect(arr[0].line2, arr[1].line1); // направление линии вперед (сторона Б)
     if (cross) {
-      crossWall(cross, arr[0].wall, arr[0].sideB);
-      crossWall(cross, arr[1].wall, arr[1].sideA);
-    }
+      arr[0].wall.userInfo.geom.v[arr[0].sideB] = new THREE.Vector2(cross.x, -cross.y);
+      arr[1].wall.userInfo.geom.v[arr[1].sideA] = new THREE.Vector2(cross.x, -cross.y);
 
-    //---- внутренние углы
-    cross = intersect(arr[0].line3, arr[1].line4); // направление линии назад (сторона А)
-    if (cross) {
-      crossWall(cross, arr[0].wall, arr[0].sideA);
-      crossWall(cross, arr[1].wall, arr[1].sideB);
-    }
-
-    cross = intersect(arr[0].line4, arr[1].line3); // направление линии назад (сторона Б)
-    if (cross) {
-      crossWall(cross, arr[0].wall, arr[0].sideB);
-      crossWall(cross, arr[1].wall, arr[1].sideA);
+      //---- внутренние углы
+      cross = intersect(arr[0].line3, arr[1].line4); // направление линии назад (сторона А)
+      if (cross) {
+        arr[0].wall.userInfo.geom.v[arr[0].sideA] = new THREE.Vector2(cross.x, -cross.y);
+        arr[1].wall.userInfo.geom.v[arr[1].sideB] = new THREE.Vector2(cross.x, -cross.y);
+      }
     }
   }
-}
 
-function crossWall(cross: boolean | THREE.Vector2, wall: Wall, idV: number) {
-  if (!cross) return;
-  if (!(cross instanceof THREE.Vector2)) return;
+  // обновляем geometry у стены, с учетом новых точек или старых (если небыло угла)
+  updateGeomWall({ wall }: { wall: Wall }) {
+    let [p1, p2] = wall.userInfo.point;
+    let h = wall.userInfo.h;
 
-  if (!cube) {
-    let material = new THREE.MeshStandardMaterial({
-      color: 0xff0000,
-      transparent: true,
-      opacity: 1,
-      depthTest: false,
-    });
-    let obj = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.07), material);
-    obj.renderOrder = 2;
-    //obj.visible = false;
-    scene.add(obj);
-    cube = obj;
+    let shape = new THREE.Shape(wall.userInfo.geom.v);
+    let geometry = new THREE.ExtrudeGeometry(shape, { bevelEnabled: false, depth: h });
+    geometry.rotateX(-Math.PI / 2);
+    geometry.translate(0, p1.position.y, 0);
+
+    wall.geometry.dispose();
+    wall.geometry = geometry;
   }
-
-  cube!.position.set(cross.x, 0, cross.y);
-
-  let v2 = [...wall.userInfo.geom.v];
-  v2[idV] = new THREE.Vector2(cross.x, -cross.y);
-
-  updateGeomWall({ wall, v2 });
-}
-
-function updateGeomWall({ wall, v2, h, width }: { wall: Wall; v2: THREE.Vector2[]; h?: number; width?: number }) {
-  let [p1, p2] = wall.userInfo.point;
-  if (!(p1 instanceof PointWall) || !(p2 instanceof PointWall)) return;
-
-  if (!width) width = wall.userInfo.width;
-  else wall.userInfo.width = width;
-
-  let dir = new THREE.Vector2(p1.position.z - p2.position.z, p1.position.x - p2.position.x).normalize(); // перпендикуляр
-  let offsetL = new THREE.Vector2(dir.x * -width, dir.y * -width);
-  let offsetR = new THREE.Vector2(dir.x * width, dir.y * width);
-
-  let arr = v2;
-
-  // arr[arr.length] = new THREE.Vector2(p1.position.x, -p1.position.z).add(offsetR);
-  // arr[arr.length] = new THREE.Vector2(p1.position.x, -p1.position.z + 0);
-  // arr[arr.length] = new THREE.Vector2(p1.position.x, -p1.position.z).add(offsetL);
-  // arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z).add(offsetL);
-  // arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z + 0);
-  // arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z).add(offsetR);
-
-  if (!h) h = wall.userInfo.h;
-  let shape = new THREE.Shape(arr);
-  let geometry = new THREE.ExtrudeGeometry(shape, { bevelEnabled: false, depth: h });
-  geometry.rotateX(-Math.PI / 2);
-  geometry.translate(0, p1.position.y, 0);
-
-  wall.geometry.dispose();
-  wall.geometry = geometry;
-
-  wall.userInfo.geom.v = arr;
 }
 
 export let cornersWall = new CornersWall();
