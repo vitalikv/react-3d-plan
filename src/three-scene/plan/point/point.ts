@@ -151,7 +151,7 @@ export class PointWall extends THREE.Mesh {
 
     if (newPos) point.position.copy(newPos);
 
-    let angle = true;
+    let angle = true; // углы у стен
     if (angle) {
       cornersWall.move({ point: this });
     } else {

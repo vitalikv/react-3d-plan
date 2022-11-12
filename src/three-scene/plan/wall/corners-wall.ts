@@ -3,8 +3,25 @@ import { scene, camOrbit } from 'three-scene/index';
 import { Wall } from 'three-scene/plan/wall/index';
 import { PointWall } from 'three-scene/plan/point/point';
 
+let nnnn = 0;
+
 class CornersWall {
   move({ point }: { point: PointWall }) {
+    let arrP = this.getPoint(point);
+
+    let walls2 = this.getWall(arrP); // массив стены у которых будут меняться углы
+
+    for (let i = 0; i < walls2.length; i++) this.defaultV(walls2[i].w, walls2[i].idP); // сбрасываем точки (userInfo.geom.v) стен до прямой стены (без углов)
+
+    for (let i = 0; i < arrP.length; i++) this.calcAngle(arrP[i]); // точки у стен получают углы
+
+    for (let i = 0; i < walls2.length; i++) this.updateGeomWall({ wall: walls2[i].w }); // создаем стены с новыми точками
+
+    camOrbit.render();
+  }
+
+  // получаем массив всех соседний точек + исходная точка
+  getPoint(point: PointWall) {
     let arrP = [point]; // массив точек (выбранная и соседние)
     let walls = point.userInfo.wall;
 
@@ -13,29 +30,35 @@ class CornersWall {
       arrP.push(p); // добавляем в массив соседние точки
     }
 
-    let walls2 = [...walls]; // массив стены у которых будут меняться углы
+    return arrP;
+  }
 
+  // массив стен у которых будут меняться углы и значение idP - указывает с 2 сторон будут меняться углы или с одной
+  getWall(arrP: PointWall[]) {
+    // idP - 0 и 1 - углы у стены будут только с одной стороны в начале или конце, 2 - есть обе точки (то есть углы у стены будут меняться с 2 сторон)
+    let walls2: { w: Wall; idP: number }[] = [];
+
+    // добавляем в массив стены, у которых есть точки из массива arrP
     for (let i = 0; i < arrP.length; i++) {
       let arrW = arrP[i].userInfo.wall;
 
       for (let i2 = 0; i2 < arrW.length; i2++) {
-        let exsist = walls2.find((w) => w === arrW[i2]);
+        let id = walls2.findIndex((item) => item.w === arrW[i2]);
 
-        if (!exsist) walls2.push(arrW[i2]); // добавляем в массив соседние стены
+        if (id < 0) {
+          let idP = arrW[i2].userInfo.point[0] === arrP[i] ? 0 : 1;
+          walls2.push({ w: arrW[i2], idP });
+        } else {
+          walls2[id].idP = 2;
+        }
       }
     }
 
-    for (let i = 0; i < walls2.length; i++) this.defaultV(walls2[i]); // сбрасываем точки (userInfo.geom.v) стен до прямой стены (без углов)
-
-    for (let i = 0; i < arrP.length; i++) this.calcAngle(arrP[i]); // точки у стен получают углы
-
-    for (let i = 0; i < walls2.length; i++) this.updateGeomWall({ wall: walls2[i] }); // создаем стены с новыми точками
-
-    camOrbit.render();
+    return walls2;
   }
 
-  // сбрасываем точки (userInfo.geom.v) стен до прямой стены (без углов)
-  defaultV(wall: Wall) {
+  // сбрасываем точки (userInfo.geom.v) стен до прямой стены (без углов), idP - с 1-ой или 2-х сторон
+  defaultV(wall: Wall, idP: number) {
     let [p1, p2] = wall.userInfo.point;
     let width = wall.userInfo.width;
 
@@ -43,14 +66,19 @@ class CornersWall {
     let offsetL = new THREE.Vector2(dir.x * -width, dir.y * -width);
     let offsetR = new THREE.Vector2(dir.x * width, dir.y * width);
 
-    let arr = [];
+    let arr = wall.userInfo.geom.v;
 
-    arr[arr.length] = new THREE.Vector2(p1.position.x, -p1.position.z).add(offsetR);
-    arr[arr.length] = new THREE.Vector2(p1.position.x, -p1.position.z + 0);
-    arr[arr.length] = new THREE.Vector2(p1.position.x, -p1.position.z).add(offsetL);
-    arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z).add(offsetL);
-    arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z + 0);
-    arr[arr.length] = new THREE.Vector2(p2.position.x, -p2.position.z).add(offsetR);
+    if (idP === 0 || idP === 2) {
+      arr[0] = new THREE.Vector2(p1.position.x, -p1.position.z).add(offsetR);
+      arr[1] = new THREE.Vector2(p1.position.x, -p1.position.z + 0);
+      arr[2] = new THREE.Vector2(p1.position.x, -p1.position.z).add(offsetL);
+    }
+
+    if (idP === 1 || idP === 2) {
+      arr[3] = new THREE.Vector2(p2.position.x, -p2.position.z).add(offsetL);
+      arr[4] = new THREE.Vector2(p2.position.x, -p2.position.z + 0);
+      arr[5] = new THREE.Vector2(p2.position.x, -p2.position.z).add(offsetR);
+    }
 
     wall.userInfo.geom.v = arr;
   }
@@ -61,7 +89,7 @@ class CornersWall {
 
     let arr = [];
     let walls = point.userInfo.wall;
-    //console.log(walls[0].userInfo.geom.v);
+
     for (let i = 0; i < walls.length; i++) {
       let order = 0; // начало стены
       if (walls[i].userInfo.point[1] === point) order = 3; // конец стены
@@ -76,10 +104,10 @@ class CornersWall {
       let pos = new THREE.Vector3().addScaledVector(dir, 0.5);
       let pos2 = new THREE.Vector3().addScaledVector(dir, 1);
 
-      helperCornersWall.showLine({ id: 0 + i * 3, v: [v1, v1.clone().add(pos)] });
-      helperCornersWall.showLine({ id: 1 + i * 3, v: [point.position, point.position.clone().add(pos)] });
-      helperCornersWall.showLine({ id: 2 + i * 3, v: [v3, v3.clone().add(pos)] });
-
+      helperCornersWall.showLine({ id: 0 + nnnn * 3, v: [v1, v1.clone().add(pos)] });
+      helperCornersWall.showLine({ id: 1 + nnnn * 3, v: [point.position, point.position.clone().add(pos)] });
+      helperCornersWall.showLine({ id: 2 + nnnn * 3, v: [v3, v3.clone().add(pos)] });
+      nnnn++;
       arr[i] = {
         wall: walls[i],
         line1: { p1: v1, p2: v1.clone().add(pos) }, // направление линии вперед (сторона А)
@@ -90,7 +118,7 @@ class CornersWall {
         sideB: 2 + order,
       };
     }
-
+    console.log(arr);
     let cross = intersect(arr[0].line1, arr[1].line2); // направление линии вперед (сторона А)
     if (cross) {
       arr[0].wall.userInfo.geom.v[arr[0].sideA] = new THREE.Vector2(cross.x, -cross.y);
@@ -146,7 +174,7 @@ class HelperCornersWall {
   crLine({ id }: { id: number }) {
     let geometry = new THREE.BufferGeometry();
     let line = new THREE.Line(geometry, this.mat[id % 3]);
-    console.log(id % 3);
+    console.log(id, id % 3);
     line.renderOrder = 1;
     scene.add(line);
 
