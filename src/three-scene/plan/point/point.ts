@@ -30,8 +30,8 @@ function geometryPoint(): THREE.BufferGeometry {
   let attrP: any = geometry.getAttribute('position');
 
   for (let i = 0; i < attrP.array.length; i += 3) {
-    attrP.array[i + 0] *= 0.5; // x
-    attrP.array[i + 2] *= 0.5; // z
+    attrP.array[i + 0] *= 0.1; // x
+    attrP.array[i + 2] *= 0.1; // z
 
     let y = attrP.array[i + 1];
     if (y < 0) {

@@ -114,7 +114,7 @@ export class Wall extends THREE.Mesh {
 
   click({ pos }: { pos: THREE.Vector3 }) {
     start();
-    console.log(this.userInfo);
+    console.log(this, this.userInfo);
 
     uimain.canvas.wall.input?.setInputValue(this.userInfo.width);
 

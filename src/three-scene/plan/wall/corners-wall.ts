@@ -7,6 +7,8 @@ let nnnn = 0;
 
 class CornersWall {
   move({ point }: { point: PointWall }) {
+    nnnn = 0;
+
     let arrP = this.getPoint(point);
 
     let walls2 = this.getWall(arrP); // массив стены у которых будут меняться углы
@@ -118,7 +120,7 @@ class CornersWall {
         sideB: 2 + order,
       };
     }
-    console.log(arr);
+
     let cross = intersect(arr[0].line1, arr[1].line2); // направление линии вперед (сторона А)
     if (cross) {
       arr[0].wall.userInfo.geom.v[arr[0].sideA] = new THREE.Vector2(cross.x, -cross.y);

@@ -44,7 +44,7 @@ export function init({ ready }: { ready: () => void }) {
   container.appendChild(renderer.domElement);
 
   canvas = renderer.domElement;
-
+  console.log(renderer);
   //Clipping
   //clipping.init({ renderer });
 

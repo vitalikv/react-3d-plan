@@ -5,6 +5,7 @@ import { PointWall, setIdWallPoint } from 'three-scene/plan/point/point';
 import { Wall, setIdWall } from 'three-scene/plan/wall/index';
 import { IFileJSON } from 'three-scene/save-load/interface';
 import { testInfoMemory } from 'three-scene/core/index';
+import { cornersWall } from 'three-scene/plan/wall/corners-wall';
 
 export async function loadLocalFile() {
   let url = 'http://react/react-3d-plan/php/loadLocal.php';
@@ -49,6 +50,8 @@ function parseFile({ data }: { data: IFileJSON }) {
 
       new Wall({ id: item.wall[i2].id, p1: point1, p2: point2, width: item.wall[i2].width });
     }
+
+    cornersWallToProject();
   }
 
   setMaxIdPoint();
@@ -104,4 +107,14 @@ function parseArrLevel(data: IFileJSON) {
   }
 
   return data2;
+}
+
+function cornersWallToProject() {
+  let arr = level.levels;
+
+  for (let i = 0; i < arr.length; i++) {
+    for (let i2 = 0; i2 < arr[i].p.length; i2++) {
+      cornersWall.move({ point: arr[i].p[i2] });
+    }
+  }
 }
