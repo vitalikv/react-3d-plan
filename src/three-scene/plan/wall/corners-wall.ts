@@ -3,13 +3,9 @@ import { scene, camOrbit } from 'three-scene/index';
 import { Wall } from 'three-scene/plan/wall/index';
 import { PointWall } from 'three-scene/plan/point/point';
 
-let nnnn = 0;
-let mainPoint: PointWall | null = null;
-
 class CornersWall {
   move({ point }: { point: PointWall }) {
-    nnnn = 0;
-    mainPoint = point;
+    helperCornersWall.active({ enabled: false, countLine: 0, clickPoint: point }); //  enabled: true - включить показ линий-помощников
 
     let arrP = this.getPoint(point);
 
@@ -110,18 +106,10 @@ class CornersWall {
       let dir = posSub.clone().normalize();
       let pos = new THREE.Vector3().addScaledVector(dir, 100);
 
-      if (mainPoint === point) {
-        helperCornersWall.showLine({ id: 0 + nnnn * 3, v: [v1, v1.clone().add(pos)] });
-        helperCornersWall.showLine({ id: 1 + nnnn * 3, v: [point.position, point.position.clone().add(pos)] });
-        helperCornersWall.showLine({ id: 2 + nnnn * 3, v: [v3, v3.clone().add(pos)] });
-        nnnn++;
-        if (nnnn > 1) nnnn = 0;
-      }
+      helperCornersWall.calcLine({ point, v1, v3, pos });
 
       let angel = Math.atan2(dir.x, dir.z);
-      if (angel < 0) {
-        angel += Math.PI * 2;
-      }
+      if (angel < 0) angel += Math.PI * 2;
 
       arr[i] = {
         wall: walls[i],
@@ -203,13 +191,34 @@ class CornersWall {
 
 export let cornersWall = new CornersWall();
 
+// класс помощник, для отображения линий
 class HelperCornersWall {
+  enabled = true;
+  countLine = 0;
+  clickPoint: PointWall | null = null;
   arr1: THREE.Line[] = [];
+
   mat = [
     new THREE.LineBasicMaterial({ color: 0x0000ff, depthTest: false, transparent: true }),
     new THREE.LineBasicMaterial({ color: 0xff0000, depthTest: false, transparent: true }),
     new THREE.LineBasicMaterial({ color: 0x00ff00, depthTest: false, transparent: true }),
   ];
+
+  active({ enabled, countLine, clickPoint }: { enabled: boolean; countLine: number; clickPoint: PointWall }) {
+    this.enabled = enabled;
+    this.countLine = countLine;
+    this.clickPoint = clickPoint;
+  }
+
+  calcLine({ point, v1, v3, pos }: { point: PointWall; v1: THREE.Vector3; v3: THREE.Vector3; pos: THREE.Vector3 }) {
+    if (this.enabled && this.clickPoint === point) {
+      this.showLine({ id: 0 + this.countLine * 3, v: [v1, v1.clone().add(pos)] });
+      this.showLine({ id: 1 + this.countLine * 3, v: [point.position, point.position.clone().add(pos)] });
+      this.showLine({ id: 2 + this.countLine * 3, v: [v3, v3.clone().add(pos)] });
+      this.countLine++;
+      if (this.countLine > 1) this.countLine = 0; // по 3 линии для 2 стен
+    }
+  }
 
   crLine({ id }: { id: number }) {
     let geometry = new THREE.BufferGeometry();
