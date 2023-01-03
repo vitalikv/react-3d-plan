@@ -102,15 +102,13 @@ class CornersWall {
       let posSub = new THREE.Vector3().subVectors(point.position, point2.position);
 
       let v1 = new THREE.Vector3(walls[i].userInfo.geom.v[0 + order].x, point.position.y, -walls[i].userInfo.geom.v[0 + order].y); // (сторона А)
-      //let v2 = new THREE.Vector3(walls[i].userInfo.geom.v[1 + order].x, point.position.y, -walls[i].userInfo.geom.v[1 + order].y);
       let v3 = new THREE.Vector3(walls[i].userInfo.geom.v[2 + order].x, point.position.y, -walls[i].userInfo.geom.v[2 + order].y); // (сторона Б)
 
       v1.sub(posSub);
       v3.sub(posSub);
 
-      let dir = new THREE.Vector3().subVectors(point.position, point2.position).normalize();
+      let dir = posSub.clone().normalize();
       let pos = new THREE.Vector3().addScaledVector(dir, 100);
-      let pos2 = new THREE.Vector3().addScaledVector(dir, 1);
 
       if (mainPoint === point) {
         helperCornersWall.showLine({ id: 0 + nnnn * 3, v: [v1, v1.clone().add(pos)] });
@@ -120,42 +118,72 @@ class CornersWall {
         if (nnnn > 1) nnnn = 0;
       }
 
+      let angel = Math.atan2(dir.x, dir.z);
+      if (angel < 0) {
+        angel += Math.PI * 2;
+      }
+
       arr[i] = {
         wall: walls[i],
-        line1: { p1: v1, p2: v1.clone().add(pos) }, // направление линии вперед (сторона А)
-        line2: { p1: v3, p2: v3.clone().add(pos) }, // направление линии вперед (сторона Б)
-        line3: { p1: v1, p2: v1.clone().sub(pos2) }, // направление линии назад (сторона А)
-        line4: { p1: v3, p2: v3.clone().sub(pos2) }, // направление линии назад (сторона Б)
+        line1: { p1: v1, p2: v1.clone().add(pos) }, // направление линии (сторона А)
+        line2: { p1: v3, p2: v3.clone().add(pos) }, // направление линии (сторона Б)
         sideA: 0 + order,
         sideB: 2 + order,
+        angel: angel,
       };
     }
 
-    let cross = intersect(arr[0].line1, arr[1].line2); // направление линии вперед (сторона А)
-    if (cross) {
-      arr[0].wall.userInfo.geom.v[arr[0].sideA] = new THREE.Vector2(cross.x, -cross.y);
-      arr[1].wall.userInfo.geom.v[arr[1].sideB] = new THREE.Vector2(cross.x, -cross.y);
+    // сортируем стены по углу поворота
+    arr.sort(function (a, b) {
+      return b.angel - a.angel;
+    });
 
-      //---- внутренние углы
-      cross = intersect(arr[0].line4, arr[1].line3); // направление линии назад (сторона Б)
+    // находим точки пересечения линий/сторон стен
+    for (let i = 0; i < arr.length; i++) {
+      let n = i === arr.length - 1 ? 0 : i + 1;
+
+      let cross = this.intersect(arr[i].line1, arr[n].line2);
       if (cross) {
-        //arr[0].wall.userInfo.geom.v[arr[0].sideB] = new THREE.Vector2(cross.x, -cross.y);
-        //arr[1].wall.userInfo.geom.v[arr[1].sideA] = new THREE.Vector2(cross.x, -cross.y);
+        arr[i].wall.userInfo.geom.v[arr[i].sideA] = new THREE.Vector2(cross.x, -cross.y);
+        arr[n].wall.userInfo.geom.v[arr[n].sideB] = new THREE.Vector2(cross.x, -cross.y);
       }
     }
+  }
 
-    cross = intersect(arr[0].line2, arr[1].line1); // направление линии вперед (сторона Б)
-    if (cross) {
-      arr[0].wall.userInfo.geom.v[arr[0].sideB] = new THREE.Vector2(cross.x, -cross.y);
-      arr[1].wall.userInfo.geom.v[arr[1].sideA] = new THREE.Vector2(cross.x, -cross.y);
+  // вычисление точки пересечения двух отрезков
+  // line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
+  // Determine the intersection point of two line segments
+  // Return FALSE if the lines don't intersect
+  intersect(line1: { p1: THREE.Vector3; p2: THREE.Vector3 }, line2: { p1: THREE.Vector3; p2: THREE.Vector3 }) {
+    let x1 = line1.p1.x;
+    let y1 = line1.p1.z;
+    let x2 = line1.p2.x;
+    let y2 = line1.p2.z;
 
-      //---- внутренние углы
-      cross = intersect(arr[0].line3, arr[1].line4); // направление линии назад (сторона А)
-      if (cross) {
-        //arr[0].wall.userInfo.geom.v[arr[0].sideA] = new THREE.Vector2(cross.x, -cross.y);
-        //arr[1].wall.userInfo.geom.v[arr[1].sideB] = new THREE.Vector2(cross.x, -cross.y);
-      }
-    }
+    let x3 = line2.p1.x;
+    let y3 = line2.p1.z;
+    let x4 = line2.p2.x;
+    let y4 = line2.p2.z;
+
+    // Check if none of the lines are of length 0
+    if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) return false;
+
+    let denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+
+    // Lines are parallel
+    if (denominator === 0) return false;
+
+    let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
+    let ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+
+    // is the intersection along the segments
+    if (ua < 0 || ua > 1 || ub < 0 || ub > 1) return false;
+
+    // Return a object with the x and y coordinates of the intersection
+    let x = x1 + ua * (x2 - x1);
+    let y = y1 + ua * (y2 - y1);
+
+    return new THREE.Vector2(x, y);
   }
 
   // обновляем geometry у стены, с учетом новых точек или старых (если небыло угла)
@@ -209,39 +237,3 @@ class HelperCornersWall {
 }
 
 let helperCornersWall = new HelperCornersWall();
-
-// вычисление точки пересечения двух отрезков
-// line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
-// Determine the intersection point of two line segments
-// Return FALSE if the lines don't intersect
-function intersect(line1: { p1: THREE.Vector3; p2: THREE.Vector3 }, line2: { p1: THREE.Vector3; p2: THREE.Vector3 }) {
-  let x1 = line1.p1.x;
-  let y1 = line1.p1.z;
-  let x2 = line1.p2.x;
-  let y2 = line1.p2.z;
-
-  let x3 = line2.p1.x;
-  let y3 = line2.p1.z;
-  let x4 = line2.p2.x;
-  let y4 = line2.p2.z;
-
-  // Check if none of the lines are of length 0
-  if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) return false;
-
-  let denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-
-  // Lines are parallel
-  if (denominator === 0) return false;
-
-  let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
-  let ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
-
-  // is the intersection along the segments
-  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) return false;
-
-  // Return a object with the x and y coordinates of the intersection
-  let x = x1 + ua * (x2 - x1);
-  let y = y1 + ua * (y2 - y1);
-
-  return new THREE.Vector2(x, y);
-}
