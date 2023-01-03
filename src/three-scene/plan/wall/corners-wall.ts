@@ -4,10 +4,12 @@ import { Wall } from 'three-scene/plan/wall/index';
 import { PointWall } from 'three-scene/plan/point/point';
 
 let nnnn = 0;
+let mainPoint: PointWall | null = null;
 
 class CornersWall {
   move({ point }: { point: PointWall }) {
     nnnn = 0;
+    mainPoint = point;
 
     let arrP = this.getPoint(point);
 
@@ -96,20 +98,28 @@ class CornersWall {
       let order = 0; // начало стены
       if (walls[i].userInfo.point[1] === point) order = 3; // конец стены
 
+      let point2 = walls[i].userInfo.point[0] === point ? walls[i].userInfo.point[1] : walls[i].userInfo.point[0];
+      let posSub = new THREE.Vector3().subVectors(point.position, point2.position);
+
       let v1 = new THREE.Vector3(walls[i].userInfo.geom.v[0 + order].x, point.position.y, -walls[i].userInfo.geom.v[0 + order].y); // (сторона А)
       //let v2 = new THREE.Vector3(walls[i].userInfo.geom.v[1 + order].x, point.position.y, -walls[i].userInfo.geom.v[1 + order].y);
       let v3 = new THREE.Vector3(walls[i].userInfo.geom.v[2 + order].x, point.position.y, -walls[i].userInfo.geom.v[2 + order].y); // (сторона Б)
 
-      let point2 = walls[i].userInfo.point[0] === point ? walls[i].userInfo.point[1] : walls[i].userInfo.point[0];
+      v1.sub(posSub);
+      v3.sub(posSub);
 
       let dir = new THREE.Vector3().subVectors(point.position, point2.position).normalize();
-      let pos = new THREE.Vector3().addScaledVector(dir, 0.5);
+      let pos = new THREE.Vector3().addScaledVector(dir, 100);
       let pos2 = new THREE.Vector3().addScaledVector(dir, 1);
 
-      helperCornersWall.showLine({ id: 0 + nnnn * 3, v: [v1, v1.clone().add(pos)] });
-      helperCornersWall.showLine({ id: 1 + nnnn * 3, v: [point.position, point.position.clone().add(pos)] });
-      helperCornersWall.showLine({ id: 2 + nnnn * 3, v: [v3, v3.clone().add(pos)] });
-      nnnn++;
+      if (mainPoint === point) {
+        helperCornersWall.showLine({ id: 0 + nnnn * 3, v: [v1, v1.clone().add(pos)] });
+        helperCornersWall.showLine({ id: 1 + nnnn * 3, v: [point.position, point.position.clone().add(pos)] });
+        helperCornersWall.showLine({ id: 2 + nnnn * 3, v: [v3, v3.clone().add(pos)] });
+        nnnn++;
+        if (nnnn > 1) nnnn = 0;
+      }
+
       arr[i] = {
         wall: walls[i],
         line1: { p1: v1, p2: v1.clone().add(pos) }, // направление линии вперед (сторона А)
@@ -129,8 +139,8 @@ class CornersWall {
       //---- внутренние углы
       cross = intersect(arr[0].line4, arr[1].line3); // направление линии назад (сторона Б)
       if (cross) {
-        arr[0].wall.userInfo.geom.v[arr[0].sideB] = new THREE.Vector2(cross.x, -cross.y);
-        arr[1].wall.userInfo.geom.v[arr[1].sideA] = new THREE.Vector2(cross.x, -cross.y);
+        //arr[0].wall.userInfo.geom.v[arr[0].sideB] = new THREE.Vector2(cross.x, -cross.y);
+        //arr[1].wall.userInfo.geom.v[arr[1].sideA] = new THREE.Vector2(cross.x, -cross.y);
       }
     }
 
@@ -142,8 +152,8 @@ class CornersWall {
       //---- внутренние углы
       cross = intersect(arr[0].line3, arr[1].line4); // направление линии назад (сторона А)
       if (cross) {
-        arr[0].wall.userInfo.geom.v[arr[0].sideA] = new THREE.Vector2(cross.x, -cross.y);
-        arr[1].wall.userInfo.geom.v[arr[1].sideB] = new THREE.Vector2(cross.x, -cross.y);
+        //arr[0].wall.userInfo.geom.v[arr[0].sideA] = new THREE.Vector2(cross.x, -cross.y);
+        //arr[1].wall.userInfo.geom.v[arr[1].sideB] = new THREE.Vector2(cross.x, -cross.y);
       }
     }
   }
