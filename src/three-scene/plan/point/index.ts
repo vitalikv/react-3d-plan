@@ -3,7 +3,7 @@ import { rayFromPointToObj } from 'three-scene/core/rayhit';
 import { PointWall } from 'three-scene/plan/point/point';
 import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
-import { convertArray } from 'three/src/animation/AnimationUtils';
+import { cornersWall } from 'three-scene/plan/wall/corners-wall';
 
 export function deletePointBtn({ point }: { point: PointWall }) {
   let w = point.userInfo.wall;
@@ -31,11 +31,14 @@ export function deletePointBtn({ point }: { point: PointWall }) {
 
   if (p.length === 2) {
     new Wall({ p1: p[0], p2: p[1] });
-    return;
+  } else {
+    p.forEach((point) => {
+      if (point.userInfo.wall.length === 0) point.delete();
+    });
   }
 
   p.forEach((point) => {
-    if (point.userInfo.wall.length === 0) point.delete();
+    if (point.userInfo.wall.length > 0) cornersWall.move({ point: point });
   });
 
   camOrbit.render();
@@ -115,6 +118,8 @@ export function finishSelectPoint({ obj, tool }: { obj: PointWall; tool?: boolea
   } else {
     //w2 = this.divideWall({obj: obj});
   }
+
+  if (o) cornersWall.move({ point: o });
 
   return o;
 }
