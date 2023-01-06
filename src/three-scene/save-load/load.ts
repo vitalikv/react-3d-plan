@@ -6,6 +6,7 @@ import { Wall, setIdWall } from 'three-scene/plan/wall/index';
 import { IFileJSON } from 'three-scene/save-load/interface';
 import { testInfoMemory } from 'three-scene/core/index';
 import { cornersWall } from 'three-scene/plan/wall/corners-wall';
+import { flooring } from 'three-scene/plan/floor/index';
 
 export async function loadLocalFile() {
   let url = 'http://react/react-3d-plan/php/loadLocal.php';
@@ -50,9 +51,11 @@ function parseFile({ data }: { data: IFileJSON }) {
 
       new Wall({ id: item.wall[i2].id, p1: point1, p2: point2, width: item.wall[i2].width });
     }
-
-    cornersWallToProject();
   }
+
+  cornersWallToProject();
+
+  flooring.calc();
 
   setMaxIdPoint();
   setMaxIdWall();
