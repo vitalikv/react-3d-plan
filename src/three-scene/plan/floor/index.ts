@@ -14,13 +14,13 @@ class Floor {
       let item = arr[i];
 
       for (let i2 = 0; i2 < item.p.length; i2++) {
-        console.log(i, item.p[i2].userInfo.id, 'item.p.length', item.p.length);
         this.addCheckFloor({ point: item.p[i2] });
       }
     }
   }
 
-  addCheckFloor({ point }: { point: PointWall }) {
+  // создаем полы для стен (если нужно)
+  protected addCheckFloor({ point }: { point: PointWall }) {
     let arrP = this.getPoint(point);
 
     for (let i = 0; i < arrP.length; i++) {
@@ -35,19 +35,14 @@ class Floor {
       if (this.checkClockWise(arr) <= 0) continue;
       if (this.detectSameZone({ arrP: arr })) continue;
 
-      let arrId = arr.map((o) => o.userInfo.id);
-      console.log(arrId);
-
       let obj = new Flooring({ pathPoints: arr });
 
       this.arrFloor[this.arrFloor.length] = obj;
     }
-
-    console.log('this.arrFloor', this.arrFloor);
   }
 
   // получаем массив всех соседних точек
-  getPoint(point: PointWall) {
+  protected getPoint(point: PointWall) {
     let arrP = []; // массив соседних точек
     let walls = point.userInfo.wall;
 
@@ -60,7 +55,7 @@ class Floor {
   }
 
   // ищем замкнутый контур
-  getContour({ pathPoint, nextPoint }: { pathPoint: PointWall[]; nextPoint: PointWall }) {
+  protected getContour({ pathPoint, nextPoint }: { pathPoint: PointWall[]; nextPoint: PointWall }) {
     let arr = pathPoint;
     let pNew = nextPoint;
 
@@ -78,6 +73,10 @@ class Floor {
       if (pNext === pPrev) continue;
       if (pNext.userInfo.wall.length < 2) continue;
 
+      // точка уже была в массиве и эта точка не первая, значит идет зацикливание
+      let ind = arr.findIndex((o) => o === pNext);
+      if (ind !== -1 && arr[0] !== pNext) return arr;
+
       let dir2 = new THREE.Vector3().subVectors(pNext.position, pNew.position).normalize();
 
       let d =
@@ -89,10 +88,6 @@ class Floor {
       if (d > 0) angle *= -1;
       //console.log(THREE.MathUtils.radToDeg(angle));
       arrD[arrD.length] = { point: pNext, angle: angle };
-
-      if (!this.isNumeric(angle)) {
-        return arr;
-      }
     }
 
     if (arrD.length > 0) {
@@ -112,13 +107,8 @@ class Floor {
     return arr;
   }
 
-  // проверка: число или нет
-  isNumeric(n: any) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-  }
-
   //площадь многоугольника (нужно чтобы понять положительное значение или отрецательное, для того чтобы понять напрвление по часовой или проитв часовой)
-  checkClockWise(arrP: PointWall[]) {
+  protected checkClockWise(arrP: PointWall[]) {
     let res = 0;
     let n = arrP.length;
     let p1, p2, p3;
@@ -147,7 +137,7 @@ class Floor {
   }
 
   // проверяем если зона с такими же точками
-  detectSameZone({ arrP }: { arrP: PointWall[] }) {
+  protected detectSameZone({ arrP }: { arrP: PointWall[] }) {
     let arrFC = this.arrFloor;
     let exsist = false;
 
@@ -174,6 +164,48 @@ class Floor {
     }
 
     return exsist;
+  }
+
+  // меняем форму полу
+  changeFormFloor({ point }: { point: PointWall }) {
+    let arr = this.findFloors({ point: point });
+
+    for (let i = 0; i < arr.length; i++) {
+      arr[i].updateGeomFloor();
+    }
+  }
+
+  // находим все полы, относящиеся к этой точке
+  protected findFloors({ point }: { point: PointWall }) {
+    let arrFC = this.arrFloor;
+    let arr = [];
+
+    for (let i = 0; i < arrFC.length; i++) {
+      let arrP = arrFC[i].userInfo.points;
+
+      let ind = arrP.findIndex((o) => o === point);
+
+      if (ind > -1) {
+        arr.push(arrFC[i]);
+
+        // let arrP2_id = arrP.map((o) => o.userInfo.id);
+        // console.log(arrP2_id);
+      }
+    }
+
+    return arr;
+  }
+
+  deleteFloors({ point }: { point: PointWall }) {
+    let arrFC = this.arrFloor;
+    let arr = this.findFloors({ point: point });
+
+    for (let i = 0; i < arr.length; i++) {
+      arr[i].delete();
+
+      let n = arrFC.indexOf(arr[i]);
+      if (n > -1) arrFC.splice(n, 1);
+    }
   }
 }
 

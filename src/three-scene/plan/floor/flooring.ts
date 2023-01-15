@@ -46,6 +46,12 @@ export class Flooring extends THREE.Mesh {
     this.render();
   }
 
+  delete() {
+    this.geometry.dispose();
+    if (!Array.isArray(this.material)) this.material.dispose();
+    scene.remove(this);
+  }
+
   render() {
     camOrbit.render();
   }

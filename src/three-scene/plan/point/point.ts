@@ -6,6 +6,7 @@ import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
 import { level } from 'three-scene/index';
 import { cornersWall } from 'three-scene/plan/wall/corners-wall';
+import { flooring } from 'three-scene/plan/floor/index';
 
 //export let points: PointWall[] = [];
 
@@ -124,6 +125,7 @@ export class PointWall extends THREE.Mesh {
       let pos = new THREE.Vector3().addVectors(intersects[0].point, offset);
 
       this.movePoint({ point: this, pos });
+      flooring.changeFormFloor({ point: this });
     };
 
     canvas.onmouseup = () => {

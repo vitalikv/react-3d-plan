@@ -4,6 +4,7 @@ import { PointWall } from 'three-scene/plan/point/point';
 import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
 import { cornersWall } from 'three-scene/plan/wall/corners-wall';
+import { flooring } from 'three-scene/plan/floor/index';
 
 export function deletePointBtn({ point }: { point: PointWall }) {
   let w = point.userInfo.wall;
@@ -19,6 +20,7 @@ export function deletePointBtn({ point }: { point: PointWall }) {
   outlinePass.selectedObjects = [];
   mouseEv.obj = null;
 
+  flooring.deleteFloors({ point });
   point.delete();
 
   // удаляем из соседних точек инфу о стенах
@@ -40,6 +42,8 @@ export function deletePointBtn({ point }: { point: PointWall }) {
   p.forEach((point) => {
     if (point.userInfo.wall.length > 0) cornersWall.move({ point: point });
   });
+
+  flooring.calc();
 
   camOrbit.render();
 }
@@ -120,6 +124,8 @@ export function finishSelectPoint({ obj, tool }: { obj: PointWall; tool?: boolea
   }
 
   if (o) cornersWall.move({ point: o });
+
+  flooring.calc();
 
   return o;
 }
