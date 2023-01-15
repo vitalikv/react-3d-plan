@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { canvas, scene, camOrbit, mouseEv, planeMath, lineAxis } from 'three-scene/index';
 import { rayIntersect } from 'three-scene/core/rayhit';
-import { nearPoint, finishSelectPoint } from 'three-scene/plan/point/index';
+import { geomPoint, nearPoint, finishSelectPoint } from 'three-scene/plan/point/index';
 import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
 import { level } from 'three-scene/index';
@@ -17,35 +17,6 @@ let matDefault = new THREE.MeshStandardMaterial({
   wireframe: false,
   depthFunc: THREE.NotEqualDepth,
 });
-
-let matActive = new THREE.MeshStandardMaterial({
-  color: 0xff0000,
-  wireframe: false,
-});
-
-let geomPoint = geometryPoint();
-
-function geometryPoint(): THREE.BufferGeometry {
-  let geometry = new THREE.CylinderGeometry(0.2, 0.2, 0.2, 18);
-
-  let attrP: any = geometry.getAttribute('position');
-
-  for (let i = 0; i < attrP.array.length; i += 3) {
-    attrP.array[i + 0] *= 0.1; // x
-    attrP.array[i + 2] *= 0.1; // z
-
-    let y = attrP.array[i + 1];
-    if (y < 0) {
-      attrP.array[i + 1] = 0;
-    }
-  }
-
-  geometry.attributes.position.needsUpdate = true;
-
-  geometry.userData.attrP = geometry.getAttribute('position').clone();
-
-  return geometry;
-}
 
 let idPoint = 1;
 
@@ -69,7 +40,7 @@ export class PointWall extends THREE.Mesh {
   };
 
   constructor({ id, pos }: { id?: number; pos: THREE.Vector3 }) {
-    super(geomPoint, matDefault);
+    super(geomPoint.geometry, matDefault);
 
     this.initObj({ id });
 

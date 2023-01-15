@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { scene, camOrbit, mouseEv, level } from 'three-scene/index';
 import { rayFromPointToObj } from 'three-scene/core/rayhit';
 import { PointWall } from 'three-scene/plan/point/point';
@@ -5,6 +6,53 @@ import { Wall } from 'three-scene/plan/wall/index';
 import { outlinePass } from 'three-scene/core/composer-render';
 import { cornersWall } from 'three-scene/plan/wall/corners-wall';
 import { flooring } from 'three-scene/plan/floor/index';
+
+class GeomPoint {
+  geometry = this.crGeom();
+
+  crGeom() {
+    let geometry = new THREE.CylinderGeometry(0.2, 0.2, 0.2, 18);
+
+    let attrP: any = geometry.getAttribute('position');
+
+    for (let i = 0; i < attrP.array.length; i += 3) {
+      attrP.array[i + 0] *= 0.5; // x
+      attrP.array[i + 2] *= 0.5; // z
+
+      let y = attrP.array[i + 1];
+      if (y < 0) {
+        attrP.array[i + 1] = 0;
+      }
+    }
+
+    geometry.attributes.position.needsUpdate = true;
+
+    geometry.userData.attrP = geometry.getAttribute('position').clone();
+
+    return geometry;
+  }
+
+  scaleGeom({ value }: { value: number }) {
+    if (value < 0.3) value = 0.3;
+
+    let geometry = this.geometry;
+
+    let attrP = geometry.userData.attrP;
+    let attrP_2 = [];
+
+    for (let i = 0; i < attrP.array.length; i += 3) {
+      attrP_2[i + 0] = attrP.array[i + 0] / value; // x
+      attrP_2[i + 2] = attrP.array[i + 2] / value; // z
+
+      attrP_2[i + 1] = attrP.array[i + 1]; // y
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(attrP_2), 3));
+    geometry.attributes.position.needsUpdate = true;
+  }
+}
+
+export let geomPoint = new GeomPoint();
 
 export function deletePointBtn({ point }: { point: PointWall }) {
   let w = point.userInfo.wall;

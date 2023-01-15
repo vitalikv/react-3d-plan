@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { composer, changeCamera } from 'three-scene/core/composer-render';
+import { geomPoint } from 'three-scene/plan/point/index';
 
 interface Param {
   renderer: THREE.WebGLRenderer;
@@ -350,6 +351,8 @@ export class CameraOrbit {
 
     camera2D.zoom = zoom;
     camera2D.updateProjectionMatrix();
+
+    geomPoint.scaleGeom({ value: camera2D.zoom });
   }
 
   cameraZoom3D({ camera3D, delta }: { camera3D: THREE.PerspectiveCamera; delta: number }) {
