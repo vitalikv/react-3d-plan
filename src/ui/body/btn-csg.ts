@@ -2,36 +2,57 @@ import { canvas } from 'three-scene/index';
 import { myCSG } from 'three-scene/index';
 
 export class UIbtnCSG {
-  elem: HTMLElement | null = null;
+  btnWind: HTMLElement | null = null;
+  btnDoor: HTMLElement | null = null;
 
   constructor() {
     this.init();
   }
 
   init() {
-    let div = document.createElement('div');
-    div.innerHTML = this.html();
-    this.elem = div.children[0] as HTMLElement;
-
     let container = document.body.querySelector('[nameId="containerScene2"]');
-    container?.append(this.elem);
+
+    let div = document.createElement('div');
+    div.innerHTML = this.htmlWind();
+    this.btnWind = div.children[0] as HTMLElement;
+    container?.append(this.btnWind);
+
+    div = document.createElement('div');
+    div.innerHTML = this.htmlDoor();
+    this.btnDoor = div.children[0] as HTMLElement;
+    container?.append(this.btnDoor);
 
     this.initEvent();
   }
 
-  html() {
+  htmlWind() {
     let html = `
         <div nameId="point" class="button1 gradient_1" style="position: absolute; left: 20px; top: 80px;">
-          csg
+          wind
+        </div>`;
+
+    return html;
+  }
+
+  htmlDoor() {
+    let html = `
+        <div nameId="point" class="button1 gradient_1" style="position: absolute; left: 20px; top: 110px;">
+          door
         </div>`;
 
     return html;
   }
 
   initEvent() {
-    this.elem!.onmousedown = () => {
+    this.btnWind!.onmousedown = () => {
       this.promise_1().then((data) => {
-        myCSG.click({ event: data.event });
+        myCSG.click({ event: data.event, type: 'wind' });
+      });
+    };
+
+    this.btnDoor!.onmousedown = () => {
+      this.promise_1().then((data) => {
+        myCSG.click({ event: data.event, type: 'door' });
       });
     };
   }

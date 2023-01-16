@@ -6,26 +6,55 @@ import { level } from 'three-scene/index';
 import { Wall } from 'three-scene/plan/wall/index';
 
 export class MyCSG {
-  csgObj = this.crBoxCSG();
+  csgObj: THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardMaterial>;
+  size = { x: 1, y: 2.1, z: 0.3 };
+  offsetY = 0;
 
   constructor() {
     //this.init();
+    this.csgObj = this.crBoxCSG();
   }
 
   crBoxCSG() {
-    const box = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1, 0.3), new THREE.MeshStandardMaterial({ color: 0xff00ff }));
+    let box = new THREE.Mesh(
+      new THREE.BoxGeometry(this.size.x, this.size.y, this.size.z),
+      new THREE.MeshStandardMaterial({ color: 0xff00ff, depthTest: true })
+    );
+    // let userInfo = { userInfo: { offsetY: 0, size: { x: 1, y: 2.1, z: 0.3 } } } as {};
+    // box = Object.assign(box, userInfo);
 
     scene.add(box);
     return box;
   }
 
-  click({ event }: { event: MouseEvent }) {
+  // в зависимости от типа (дверь, окно) устанавливаем размеры
+  protected typeCSG({ type }: { type: string }) {
+    let box = this.csgObj;
+
+    if (type === 'wind') {
+      this.size = { x: 1.4, y: 1.7, z: 0.3 };
+      this.offsetY = 0.7;
+    }
+    if (type === 'door') {
+      this.size = { x: 1, y: 2.1, z: 0.3 };
+      this.offsetY = 0;
+    }
+
+    box.geometry.dispose();
+    box.geometry = new THREE.BoxGeometry(this.size.x, this.size.y, this.size.z);
+  }
+
+  click({ event, type }: { event: MouseEvent; type: string }) {
+    this.typeCSG({ type });
+
     planeMath.position.y = level.getPosY1();
     planeMath.rotation.set(-Math.PI / 2, 0, 0);
     planeMath.updateMatrixWorld();
 
     let intersects = rayIntersect(event, planeMath, 'one');
     if (intersects.length === 0) return;
+
+    let wall: Wall | undefined = undefined;
 
     canvas.onmousemove = (event) => {
       camOrbit.stopMove = true;
@@ -36,9 +65,15 @@ export class MyCSG {
 
       this.csgObj.position.copy(intersects[0].point);
 
-      this.findWall({ event });
+      if (!this.csgObj.geometry.boundingBox) this.csgObj.geometry.computeBoundingBox();
+      let bound = this.csgObj.geometry.boundingBox;
+      this.csgObj.position.y = (bound!.max.y - bound!.min.y) / 2 + this.offsetY;
 
-      camOrbit.render();
+      wall = this.findWall({ event });
+
+      if (wall) this.changeWightCsg({ wall });
+
+      this.render();
     };
 
     canvas.onmousedown = (event) => {
@@ -48,28 +83,35 @@ export class MyCSG {
       camOrbit.stopMove = false;
       mouseEv.stop = false;
 
-      camOrbit.render();
+      if (event.button === 0) {
+        if (wall) this.csgSubtract({ wall });
+      }
+
+      this.render();
     };
   }
 
-  findWall({ event }: { event: MouseEvent }) {
+  protected findWall({ event }: { event: MouseEvent }) {
     let intersects = rayIntersect(event, level.getArrWall(), 'arr');
     if (intersects.length === 0) return;
 
     let pos = intersects[0].point;
     let wall = intersects[0].object;
 
-    if (wall instanceof Wall) {
-      let p = wall.userInfo.point;
+    if (!(wall instanceof Wall)) return;
 
-      let pos2 = this.spPoint(p[0].position, p[1].position, pos);
+    let p = wall.userInfo.point;
 
-      let dir = new THREE.Vector3().subVectors(p[0].position, p[1].position);
-      let rotY = Math.atan2(dir.x, dir.z);
+    let pos2 = this.spPoint(p[0].position, p[1].position, pos);
 
-      this.csgObj.position.copy(pos2);
-      this.csgObj.rotation.y = rotY + Math.PI / 2;
-    }
+    let dir = new THREE.Vector3().subVectors(p[0].position, p[1].position);
+    let rotY = Math.atan2(dir.x, dir.z);
+
+    this.csgObj.position.x = pos2.x;
+    this.csgObj.position.z = pos2.z;
+    this.csgObj.rotation.y = rotY + Math.PI / 2;
+
+    return wall;
   }
 
   // проекция точки(С) на прямую (A,B)
@@ -90,5 +132,33 @@ export class MyCSG {
       z = y1 + u * py;
 
     return new THREE.Vector3(x, 0, z);
+  }
+
+  // меняем ширину объекта CSG, чтобы подстроится под ширину стены
+  protected changeWightCsg({ wall }: { wall: Wall }) {
+    let box = this.csgObj;
+    let width = wall.userInfo.width;
+
+    let x = this.csgObj.geometry.parameters.width;
+    let y = this.csgObj.geometry.parameters.height;
+    box.geometry.dispose();
+    box.geometry = new THREE.BoxGeometry(x, y, width * 2 + 0.2);
+  }
+
+  // делаем проем в стене
+  protected csgSubtract({ wall }: { wall: Wall }) {
+    let box = this.csgObj;
+    box.updateMatrix();
+    wall.updateMatrix();
+
+    const subRes = CSG.subtract(wall, box);
+    //subRes.position.add(new THREE.Vector3(0, 3, 0));
+
+    wall.geometry.dispose();
+    wall.geometry = subRes.geometry;
+  }
+
+  protected render() {
+    camOrbit.render();
   }
 }
