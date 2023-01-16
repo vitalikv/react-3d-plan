@@ -60,7 +60,7 @@ class CornersWall {
   // сбрасываем точки (userInfo.geom.v) стен до прямой стены (без углов), idP - с 1-ой или 2-х сторон
   defaultV(wall: Wall, idP: number) {
     let [p1, p2] = wall.userInfo.point;
-    let width = wall.userInfo.width;
+    let width = wall.userInfo.width / 2;
 
     let dir = new THREE.Vector2(p1.position.z - p2.position.z, p1.position.x - p2.position.x).normalize(); // перпендикуляр
     let offsetL = new THREE.Vector2(dir.x * -width, dir.y * -width);

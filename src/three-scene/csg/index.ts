@@ -137,7 +137,7 @@ export class MyCSG {
   // меняем ширину объекта CSG, чтобы подстроится под ширину стены
   protected changeWightCsg({ wall }: { wall: Wall }) {
     let box = this.csgObj;
-    let width = wall.userInfo.width;
+    let width = wall.userInfo.width / 2;
 
     let x = this.csgObj.geometry.parameters.width;
     let y = this.csgObj.geometry.parameters.height;
