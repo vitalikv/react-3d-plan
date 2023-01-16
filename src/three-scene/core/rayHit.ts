@@ -7,7 +7,7 @@ export function rayIntersect(
   event: MouseEvent,
   obj: PointWall | PointWall[] | Wall | Wall[] | THREE.Mesh | THREE.Mesh[],
   t?: string
-): THREE.Intersection<PointWall | THREE.Mesh>[] {
+): THREE.Intersection<PointWall | Wall | THREE.Mesh>[] {
   let mouse = getMousePosition(event);
 
   function getMousePosition(event: MouseEvent) {

@@ -1,11 +1,12 @@
 import { UIheader } from 'ui/top-panel/header';
 import { UIbtnCam } from 'ui/body/btn-camera';
 import { UIbtnPoint } from 'ui/body/btn-point';
+import { UIbtnCSG } from 'ui/body/btn-csg';
 import { UIinpit } from 'ui/body/wall/ui';
 import { UIrightPanel } from 'ui/right-panel/right-panel';
 
 type Itp = { header?: UIheader };
-type Icanv = { btnCam?: UIbtnCam; btnPoint?: UIbtnPoint; wall: { input?: UIinpit } };
+type Icanv = { btnCam?: UIbtnCam; btnPoint?: UIbtnPoint; btnCSG?: UIbtnCSG; wall: { input?: UIinpit } };
 
 export class UImain {
   tp: Itp = {};
@@ -21,6 +22,7 @@ export class UImain {
     this.tp.header = new UIheader();
     this.canvas.btnCam = new UIbtnCam();
     this.canvas.btnPoint = new UIbtnPoint();
+    this.canvas.btnCSG = new UIbtnCSG();
     this.canvas.wall.input = new UIinpit();
     this.rp = new UIrightPanel();
   }

@@ -14,6 +14,7 @@ import { initGrid } from 'three-scene/plan/level/grid';
 import { apiThreeToUi } from 'api/three-ui';
 
 import { testCSG } from 'three-scene/csg/test';
+import { MyCSG } from 'three-scene/csg/index';
 import { UImain } from 'ui/main';
 
 export let container: HTMLElement | null, canvas: HTMLCanvasElement, scene: THREE.Scene;
@@ -23,6 +24,7 @@ export let renderer: THREE.WebGLRenderer;
 export let level: Level;
 export let lineAxis: LineAxis;
 export let uimain: UImain;
+export let myCSG: MyCSG;
 let ambientLight, light;
 
 export function init({ ready }: { ready: () => void }) {
@@ -89,6 +91,7 @@ export function init({ ready }: { ready: () => void }) {
 
   //testCSG
   //testCSG();
+  myCSG = new MyCSG();
 
   //deleteObj
   initDeleteObj();
