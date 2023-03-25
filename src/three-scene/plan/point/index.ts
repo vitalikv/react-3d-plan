@@ -3,7 +3,7 @@ import { scene, camOrbit, mouseEv, level } from 'three-scene/index';
 import { rayFromPointToObj } from 'three-scene/core/rayhit';
 import { PointWall } from 'three-scene/plan/point/point';
 import { Wall } from 'three-scene/plan/wall/index';
-import { outlinePass } from 'three-scene/core/composer-render';
+import { outlinePass, outlineSelectedObjs } from 'three-scene/core/composer-render';
 import { cornersWall } from 'three-scene/plan/wall/corners-wall';
 import { flooring } from 'three-scene/plan/floor/index';
 
@@ -65,7 +65,8 @@ export function deletePointBtn({ point }: { point: PointWall }) {
 
   if (p.length > 2) return;
 
-  outlinePass.selectedObjects = [];
+  //outlinePass.selectedObjects = [];
+  outlineSelectedObjs();
   mouseEv.obj = null;
 
   flooring.deleteFloors({ point });
@@ -123,7 +124,8 @@ export function finishSelectPoint({ obj, tool }: { obj: PointWall; tool?: boolea
 
   // точка состыковалась с точкой
   if (o !== null && o instanceof PointWall) {
-    outlinePass.selectedObjects = [];
+    //outlinePass.selectedObjects = [];
+    outlineSelectedObjs();
     mouseEv.obj = null;
     let w = obj.userInfo.wall;
 

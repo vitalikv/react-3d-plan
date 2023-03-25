@@ -36,7 +36,7 @@ export function init({ ready }: { ready: () => void }) {
   scene.background = new THREE.Color(0xffffff);
 
   // RENDERER
-  renderer = new THREE.WebGLRenderer({ logarithmicDepthBuffer: true, alpha: true });
+  renderer = new THREE.WebGLRenderer({ powerPreference: 'high-performance', logarithmicDepthBuffer: true, alpha: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(container.clientWidth, container.clientHeight, false);
   renderer.outputEncoding = THREE.sRGBEncoding;
@@ -62,7 +62,7 @@ export function init({ ready }: { ready: () => void }) {
   initComposerRender({ renderer, canvas, scene, camera: camOrbit.activeCam });
 
   // LIGHTS
-  ambientLight = new THREE.AmbientLight(0x333333);
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 
   light = new THREE.DirectionalLight(0xffffff, 1.0);
   light.position.set(0.32, 0.39, 0.7);

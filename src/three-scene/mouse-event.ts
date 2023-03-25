@@ -4,7 +4,7 @@ import { rayIntersect } from 'three-scene/core/rayhit';
 import { PointWall } from 'three-scene/plan/point/point';
 import { Wall } from 'three-scene/plan/wall/index';
 import { level } from 'three-scene/index';
-import { outlinePass } from 'three-scene/core/composer-render';
+import { outlinePass, outlineSelectedObjs } from 'three-scene/core/composer-render';
 
 export class Mouse {
   canvas;
@@ -79,7 +79,8 @@ export class Mouse {
 
   resetSelect() {
     this.obj = null;
-    outlinePass.selectedObjects = [];
+    //outlinePass.selectedObjects = [];
+    outlineSelectedObjs();
   }
 
   render() {

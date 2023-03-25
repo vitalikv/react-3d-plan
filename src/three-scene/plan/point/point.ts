@@ -3,7 +3,7 @@ import { canvas, scene, camOrbit, mouseEv, planeMath, lineAxis } from 'three-sce
 import { rayIntersect } from 'three-scene/core/rayhit';
 import { geomPoint, nearPoint, finishSelectPoint } from 'three-scene/plan/point/index';
 import { Wall } from 'three-scene/plan/wall/index';
-import { outlinePass } from 'three-scene/core/composer-render';
+import { outlinePass, outlineSelectedObjs } from 'three-scene/core/composer-render';
 import { level } from 'three-scene/index';
 import { cornersWall } from 'three-scene/plan/wall/corners-wall';
 import { flooring } from 'three-scene/plan/floor/index';
@@ -75,7 +75,8 @@ export class PointWall extends THREE.Mesh {
 
     cornersWall.move({ point: this });
 
-    outlinePass.selectedObjects = [this];
+    //outlinePass.selectedObjects = [this];
+    outlineSelectedObjs(this);
     this.render();
 
     let offset = this.position.clone().sub(pos);

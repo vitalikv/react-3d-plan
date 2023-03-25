@@ -1,5 +1,6 @@
 import { Wall } from 'three-scene/plan/wall/index';
 import { mouseEv, camOrbit } from 'three-scene/index';
+import { cornersWall } from 'three-scene/plan/wall/corners-wall';
 
 export class UIinpit {
   elem: HTMLElement | null = null;
@@ -47,6 +48,8 @@ export class UIinpit {
 
     if (obj instanceof Wall) {
       obj.updateGeomWall({ width: Number(event.target.value) });
+      cornersWall.move({ point: obj.userInfo.point[0] });
+      cornersWall.move({ point: obj.userInfo.point[1] });
       camOrbit.render();
     }
   }

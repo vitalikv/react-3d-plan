@@ -3,7 +3,7 @@ import { canvas, scene, camOrbit, mouseEv, planeMath, uimain } from 'three-scene
 import { rayIntersect } from 'three-scene/core/rayhit';
 import { PointWall } from 'three-scene/plan/point/point';
 import { testInfoMemory } from 'three-scene/core/index';
-import { outlinePass } from 'three-scene/core/composer-render';
+import { outlinePass, outlineSelectedObjs } from 'three-scene/core/composer-render';
 import { level } from 'three-scene/index';
 import { clipping } from 'three-scene/core/clipping';
 
@@ -119,7 +119,8 @@ export class Wall extends THREE.Mesh {
 
     uimain.canvas.wall.input?.setInputValue(this.userInfo.width);
 
-    outlinePass.selectedObjects = [this];
+    //outlinePass.selectedObjects = [this];
+    outlineSelectedObjs(this);
     this.render();
 
     function start() {
@@ -171,7 +172,8 @@ export class Wall extends THREE.Mesh {
 
   // удаляем стену и очищаем инфу в точках об этой стене
   deleteWallPoint() {
-    outlinePass.selectedObjects = [];
+    //outlinePass.selectedObjects = [];
+    outlineSelectedObjs();
     this.userInfo.point.forEach((point) => {
       point.delWall({ wall: this });
       if (point.userInfo.wall.length === 0) point.delete();
